@@ -6,6 +6,7 @@ import ViewProduct from './pages/ViewProduct';
 import ViewStock from './pages/ViewStock';
 import AddStock from './pages/AddStock';
 import ReleaseStock from './pages/ReleaseStock';
+import ViewEditStock from './pages/ViewEditStock';
 import './index.css';
 
 
@@ -21,6 +22,7 @@ const App = () => {
                 <Route path="/view-stock" element={<ViewStock />} />
                 <Route path="/add-stock" element={<AddStock />} />
                 <Route path="/release-stock" element={<ReleaseStock />} />
+                <Route path="/edit" element={<ViewEditStock />} />
             </Routes>
       </Router>
     );
