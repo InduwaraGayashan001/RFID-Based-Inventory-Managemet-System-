@@ -16,6 +16,10 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import Typography from '@mui/material/Typography';
+// import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+// import SaveIcon from '@mui/icons-material/Save';
 
 const columns = [
   { id: 'number', label: 'Number', minWidth: 50 },
@@ -32,7 +36,7 @@ function ReleaseStock() {
   ]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
-  const [editIndex, setEditIndex] = React.useState(null);
+  // const [editIndex, setEditIndex] = React.useState(null);
   const [confirmDelete, setConfirmDelete] = React.useState({ open: false, index: null });
 
   const handleRowChange = (index, field, value) => {
@@ -68,17 +72,17 @@ function ReleaseStock() {
     setConfirmDelete({ open: false, index: null });
   };
 
-  const handleEdit = (index) => {
-    setEditIndex(index);
-  };
+  // const handleEdit = (index) => {
+  //   setEditIndex(index);
+  // };
 
-  const handleSave = () => {
-    setEditIndex(null);
-  };
+  // const handleSave = () => {
+  //   setEditIndex(null);
+  // };
 
-  const handleCancelEdit = () => {
-    setEditIndex(null);
-  };
+  // const handleCancelEdit = () => {
+  //   setEditIndex(null);
+  // };
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -109,7 +113,24 @@ function ReleaseStock() {
 
   return (
     <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-      <TableContainer sx={{ maxHeight: 440 }}>
+      {/* <div style={{ padding: '16px' }}> */}
+      <div >
+        <Typography
+          variant="h4"
+          component="h1"
+          align="center"
+          gutterBottom
+          sx={{
+            fontSize: '2.0rem',
+            fontWeight: 'bold',
+            color: '#1976d2', // Primary color for heading
+          }}
+        >
+          Release Stock
+        </Typography>
+      </div>
+
+      <TableContainer sx={{ maxHeight: 370 }}>
         <Table stickyHeader aria-label="sticky table">
           <TableHead>
             <TableRow>
@@ -131,7 +152,7 @@ function ReleaseStock() {
                   <TableCell>{row.number}</TableCell>
                   <TableCell>{row.stockId}</TableCell>
                   <TableCell>
-                    {editIndex === index ? (
+                    {/* {editIndex === index ? (
                       <Select
                         value={row.productName}
                         onChange={(e) => handleRowChange(index, 'productName', e.target.value)}
@@ -145,13 +166,13 @@ function ReleaseStock() {
                         <MenuItem value="Product 2">Product 2</MenuItem>
                         <MenuItem value="Product 3">Product 3</MenuItem>
                       </Select>
-                    ) : (
-                      row.productName
-                    )}
+                    ) : ( */}
+                      {row.productName}
+                    {/* )} */}
                   </TableCell>
                   
                   <TableCell>
-                  {editIndex === index ? (
+                  {/* {editIndex === index ? (
                     <TextField
                       type="number"
                       value={row.releaseCount}
@@ -164,7 +185,7 @@ function ReleaseStock() {
                       fullWidth
                       placeholder="Enter Release Count"
                     />
-                  ) : (
+                  ) : ( */}
                     <>
                       
                       <TextField
@@ -176,10 +197,10 @@ function ReleaseStock() {
                         style={{ marginLeft: '8px' }}
                       />
                     </>
-                  )}
+                  {/* )} */}
                 </TableCell>
 
-                  <TableCell>
+                  {/* <TableCell>
                     {editIndex === index ? (
                       <>
                         <Button variant="contained" color="primary" onClick={handleSave}>
@@ -203,7 +224,65 @@ function ReleaseStock() {
                         </Button>
                       </>
                     )}
+                  </TableCell> */}
+
+                  <TableCell>
+                    {/* {editIndex === index ? (
+                      <>
+                        <Button
+                          variant="contained"
+                          sx={{
+                            backgroundColor: '#24A0ED',
+                            color: 'white',
+                            marginRight: '8px',
+                          }}
+                          onClick={handleSave}
+                          startIcon={<SaveIcon />}
+                        >
+                          Save
+                        </Button>
+                        <Button
+                          variant="contained"
+                          sx={{
+                            backgroundColor: '#d11a2a',
+                            color: 'white',
+                          }}
+                          onClick={handleCancelEdit}
+                        >
+                          Cancel
+                        </Button>
+                      </>
+                    ) : ( */}
+                      <>
+                        {/* <Button
+                          variant="contained"
+                          sx={{
+                            backgroundColor: '#24A0ED',
+                            color: 'white',
+                            marginRight: '8px',
+                          }}
+                          onClick={() => handleEdit(index)}
+                          startIcon={<EditIcon />}
+                        >
+                          Edit
+                        </Button> */}
+                        <Button
+                          variant="contained"
+                          sx={{
+                            backgroundColor: '#d11a2a',
+                            color: 'white',
+                          }}
+                          onClick={() => openConfirmDelete(index)}
+                          startIcon={<DeleteIcon />}
+                        >
+                          Delete
+                        </Button>
+                      </>
+                    {/* )} */}
                   </TableCell>
+
+
+
                 </TableRow>
               ))}
           </TableBody>
@@ -220,7 +299,7 @@ function ReleaseStock() {
       />
       <div style={{ display: 'flex', justifyContent: 'space-between', padding: '16px' }}>
         <Button variant="contained" onClick={handleAddRow}>
-          Add Row
+          Add Item
         </Button>
         <Button variant="contained" color="primary" onClick={handleSubmit}>
           Release
@@ -235,7 +314,7 @@ function ReleaseStock() {
         <DialogTitle id="confirm-delete-title">Confirm Delete</DialogTitle>
         <DialogContent>
           <DialogContentText id="confirm-delete-description">
-            Are you sure you want to delete this row?
+            Are you sure you want to delete this item?
           </DialogContentText>
         </DialogContent>
         <DialogActions>

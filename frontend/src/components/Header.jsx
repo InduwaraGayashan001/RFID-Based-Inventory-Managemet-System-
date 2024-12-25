@@ -15,6 +15,7 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import { useNavigate } from 'react-router-dom';
+import Clogo from '../assets/clogo.png';
 
 const headerWidth = 240;
 const navItems = [
@@ -67,13 +68,14 @@ function Header(props) {
           >
             <MenuIcon />
           </IconButton>
-
+          
           <Typography
             variant="h5"
             component="div"
             sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
           >
             <Button sx={{ color: '#fff' }} onClick={() => navigate("/")}>
+            <img src={Clogo} alt="Company Logo" style={{ maxWidth: '40px', height: 'auto', padding: '5px' }} />
                 Inventory Management System
             </Button>
             </Typography>

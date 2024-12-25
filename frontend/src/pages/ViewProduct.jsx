@@ -15,6 +15,9 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import TextField from '@mui/material/TextField';
 import AddProductPopup from '../components/AddProductPopup'; // Import the AddProductPopup component
+import Typography from '@mui/material/Typography';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 const columns = [
   { id: 'productId', label: 'Product ID', minWidth: 150 },
@@ -89,7 +92,24 @@ function ViewProduct() {
 
   return (
     <Paper sx={{ width: '100%', overflow: 'hidden', position: 'relative' }}>
-      <TableContainer sx={{ maxHeight: 440 }}>
+      {/* <div style={{ padding: '16px' }}> */}
+      <div>
+        <Typography
+          variant="h4"
+          component="h1"
+          align="center"
+          gutterBottom
+          sx={{
+            fontSize: '2.0rem',
+            fontWeight: 'bold',
+            color: '#1976d2', // Primary color for heading
+          }}
+        >
+          Product
+        </Typography>
+      </div>
+
+      <TableContainer sx={{ maxHeight: 370 }}>
         <Table stickyHeader aria-label="sticky table">
           <TableHead>
             <TableRow>
@@ -101,27 +121,34 @@ function ViewProduct() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((row, index) => (
-                <TableRow key={index}>
-                  <TableCell>{row.productId}</TableCell>
-                  <TableCell>{row.productName}</TableCell>
-                  <TableCell>
-                    <Button variant="contained" color="primary" onClick={() => handleEdit(index)}>
-                      Edit
-                    </Button>
-                    <Button
-                      variant="contained"
-                      color="secondary"
-                      onClick={() => openConfirmDelete(index)}
-                    >
-                      Delete
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-          </TableBody>
+  {rows
+    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+    .map((row, index) => (
+      <TableRow key={index}>
+        <TableCell>{row.productId}</TableCell>
+        <TableCell>{row.productName}</TableCell>
+        <TableCell>
+          <Button
+            variant="contained"
+            sx={{ backgroundColor: '#24A0ED', color: 'white', marginRight: '8px' }}
+            onClick={() => handleEdit(index)}
+            startIcon={<EditIcon />}
+          >
+            Edit
+          </Button>
+          <Button
+            variant="contained"
+            sx={{ backgroundColor: '#d11a2a', color: 'white' }}
+            onClick={() => openConfirmDelete(index)}
+            startIcon={<DeleteIcon />}
+          >
+            Delete
+          </Button>
+        </TableCell>
+      </TableRow>
+    ))}
+</TableBody>
+
         </Table>
       </TableContainer>
       <TablePagination
@@ -148,7 +175,7 @@ function ViewProduct() {
         <DialogTitle id="confirm-delete-title">Confirm Delete</DialogTitle>
         <DialogContent>
           <DialogContentText id="confirm-delete-description">
-            Are you sure you want to delete this row?
+            Are you sure you want to delete this product?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
