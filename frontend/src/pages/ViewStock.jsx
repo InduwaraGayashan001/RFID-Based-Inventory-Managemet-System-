@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -16,6 +16,10 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import Typography from '@mui/material/Typography';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import SaveIcon from '@mui/icons-material/Save';
 
 const columns = [
   { id: 'number', label: 'Number', minWidth: 50 },
@@ -26,8 +30,15 @@ const columns = [
   { id: 'actions', label: 'Actions', minWidth: 200 },
 ];
 
+// Mock data
+const initialRows = [
+  { number: 1, stockId: 'S001', productName: 'Product 1', count: 10, purchasingPrice: 100 },
+  { number: 2, stockId: 'S002', productName: 'Product 2', count: 15, purchasingPrice: 150 },
+  { number: 3, stockId: 'S003', productName: 'Product 3', count: 8, purchasingPrice: 120 },
+];
+
 function ViewStock() {
-  const [rows, setRows] = React.useState([]);
+  const [rows, setRows] = React.useState(initialRows);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [editIndex, setEditIndex] = React.useState(null);
@@ -79,6 +90,21 @@ function ViewStock() {
 
   return (
     <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+      <div style={{ padding: '16px' }}>
+        <Typography
+          variant="h4"
+          component="h1"
+          align="center"
+          gutterBottom
+          sx={{
+            fontSize: '2.0rem',
+            fontWeight: 'bold',
+            color: '#1976d2',
+          }}
+        >
+          View Stock
+        </Typography>
+      </div>
       <TableContainer sx={{ maxHeight: 440 }}>
         <Table stickyHeader aria-label="sticky table">
           <TableHead>
@@ -105,9 +131,6 @@ function ViewStock() {
                         displayEmpty
                         fullWidth
                       >
-                        <MenuItem value="">
-                          <em>Select Product</em>
-                        </MenuItem>
                         <MenuItem value="Product 1">Product 1</MenuItem>
                         <MenuItem value="Product 2">Product 2</MenuItem>
                         <MenuItem value="Product 3">Product 3</MenuItem>
@@ -141,30 +164,60 @@ function ViewStock() {
                     )}
                   </TableCell>
                   <TableCell>
-                    {editIndex === index ? (
-                      <>
-                        <Button variant="contained" color="primary" onClick={handleSave}>
-                          Save
-                        </Button>
-                        <Button variant="contained" color="secondary" onClick={handleCancelEdit}>
-                          Cancel
-                        </Button>
-                      </>
-                    ) : (
-                      <>
-                        <Button variant="contained" onClick={() => handleEdit(index)}>
-                          Edit
-                        </Button>
-                        <Button
-                          variant="contained"
-                          color="secondary"
-                          onClick={() => openConfirmDelete(index)}
-                        >
-                          Delete
-                        </Button>
-                      </>
-                    )}
-                  </TableCell>
+  {editIndex === index ? (
+    <>
+      <Button
+        variant="contained"
+        sx={{
+          backgroundColor: '#24A0ED',
+          color: 'white',
+          marginRight: '8px',
+        }}
+        onClick={handleSave}
+        startIcon={<SaveIcon />}
+      >
+        Save
+      </Button>
+      <Button
+        variant="contained"
+        sx={{
+          backgroundColor: '#d11a2a',
+          color: 'white',
+        }}
+        onClick={handleCancelEdit}
+      >
+        Cancel
+      </Button>
+    </>
+  ) : (
+    <>
+      <Button
+        variant="contained"
+        sx={{
+          backgroundColor: '#24A0ED',
+          color: 'white',
+          marginRight: '8px',
+        }}
+        onClick={() => handleEdit(index)}
+        startIcon={<EditIcon />}
+      >
+        Edit
+      </Button>
+      <Button
+        variant="contained"
+        sx={{
+          backgroundColor: '#d11a2a',
+          color: 'white',
+        }}
+        onClick={() => openConfirmDelete(index)}
+        startIcon={<DeleteIcon />}
+      >
+        Delete
+      </Button>
+    </>
+  )}
+</TableCell>
+
                 </TableRow>
               ))}
           </TableBody>
@@ -188,7 +241,7 @@ function ViewStock() {
         <DialogTitle id="confirm-delete-title">Confirm Delete</DialogTitle>
         <DialogContent>
           <DialogContentText id="confirm-delete-description">
-            Are you sure you want to delete this row?
+            Are you sure you want to delete this stock?
           </DialogContentText>
         </DialogContent>
         <DialogActions>

@@ -16,6 +16,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import Typography from '@mui/material/Typography';
 
 const columns = [
   { id: 'number', label: 'Number', minWidth: 50 },
@@ -87,7 +88,23 @@ function ViewEditStock() {
 
   return (
     <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-      <TableContainer sx={{ maxHeight: 440 }}>
+      {/* <div style={{ padding: '16px' }}> */}
+      <div >
+        <Typography
+          variant="h4"
+          component="h1"
+          align="center"
+          gutterBottom
+          sx={{
+            fontSize: '2.0rem',
+            fontWeight: 'bold',
+            color: '#1976d2', // Primary color for heading
+          }}
+        >
+          View Edit Stock
+        </Typography>
+      </div>
+      <TableContainer sx={{ maxHeight: 370 }}>
         <Table stickyHeader aria-label="sticky table">
           <TableHead>
             <TableRow>
