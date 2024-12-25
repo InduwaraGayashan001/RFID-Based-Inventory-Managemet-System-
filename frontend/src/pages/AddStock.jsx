@@ -7,59 +7,56 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
+import TextField from '@mui/material/TextField';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import Button from '@mui/material/Button';
 
 const columns = [
-  { id: 'name', label: 'Name', minWidth: 170 },
-  { id: 'code', label: 'ISO\u00a0Code', minWidth: 100 },
-  {
-    id: 'population',
-    label: 'Population',
-    minWidth: 170,
-    align: 'right',
-    format: (value) => value.toLocaleString('en-US'),
-  },
-  {
-    id: 'size',
-    label: 'Size\u00a0(km\u00b2)',
-    minWidth: 170,
-    align: 'right',
-    format: (value) => value.toLocaleString('en-US'),
-  },
-  {
-    id: 'density',
-    label: 'Density',
-    minWidth: 170,
-    align: 'right',
-    format: (value) => value.toFixed(2),
-  },
-];
-
-function createData(name, code, population, size) {
-  const density = population / size;
-  return { name, code, population, size, density };
-}
-
-const rows = [
-  createData('India', 'IN', 1324171354, 3287263),
-  createData('China', 'CN', 1403500365, 9596961),
-  createData('Italy', 'IT', 60483973, 301340),
-  createData('United States', 'US', 327167434, 9833520),
-  createData('Canada', 'CA', 37602103, 9984670),
-  createData('Australia', 'AU', 25475400, 7692024),
-  createData('Germany', 'DE', 83019200, 357578),
-  createData('Ireland', 'IE', 4857000, 70273),
-  createData('Mexico', 'MX', 126577691, 1972550),
-  createData('Japan', 'JP', 126317000, 377973),
-  createData('France', 'FR', 67022000, 640679),
-  createData('United Kingdom', 'GB', 67545757, 242495),
-  createData('Russia', 'RU', 146793744, 17098246),
-  createData('Nigeria', 'NG', 200962417, 923768),
-  createData('Brazil', 'BR', 210147125, 8515767),
+  { id: 'number', label: 'Number', minWidth: 50 },
+  { id: 'stockId', label: 'Stock ID', minWidth: 150 },
+  { id: 'productName', label: 'Product Name', minWidth: 150 },
+  { id: 'count', label: 'Count', minWidth: 100 },
+  { id: 'purchasingPrice', label: 'Purchasing Price', minWidth: 150 },
+  { id: 'delete', label: 'Delete', minWidth: 100 },
 ];
 
 function AddStock() {
+  const [rows, setRows] = React.useState([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
+
+  const handleAddRow = () => {
+    setRows((prevRows) => [
+      ...prevRows,
+      {
+        number: prevRows.length + 1,
+        stockId: 'Auto-generated', // Replace with actual RFID reader logic
+        productName: '',
+        count: '',
+        purchasingPrice: '',
+      },
+    ]);
+  };
+
+  const handleRowChange = (index, field, value) => {
+    const updatedRows = rows.map((row, i) =>
+      i === index ? { ...row, [field]: value } : row
+    );
+    setRows(updatedRows);
+  };
+
+  const handleDeleteRow = (index) => {
+    const updatedRows = rows
+      .filter((_, i) => i !== index)
+      .map((row, i) => ({ ...row, number: i + 1 }));
+    setRows(updatedRows);
+  };
+
+  const handleSubmit = () => {
+    console.log('Submitted rows:', rows);
+    // Add logic to send the rows data to the backend here
+  };
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -79,7 +76,6 @@ function AddStock() {
               {columns.map((column) => (
                 <TableCell
                   key={column.id}
-                  align={column.align}
                   style={{ minWidth: column.minWidth }}
                 >
                   {column.label}
@@ -90,22 +86,58 @@ function AddStock() {
           <TableBody>
             {rows
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((row) => {
-                return (
-                  <TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
-                    {columns.map((column) => {
-                      const value = row[column.id];
-                      return (
-                        <TableCell key={column.id} align={column.align}>
-                          {column.format && typeof value === 'number'
-                            ? column.format(value)
-                            : value}
-                        </TableCell>
-                      );
-                    })}
-                  </TableRow>
-                );
-              })}
+              .map((row, index) => (
+                <TableRow key={index}>
+                  <TableCell>{row.number}</TableCell>
+                  <TableCell>{row.stockId}</TableCell>
+                  <TableCell>
+                    <Select
+                      value={row.productName}
+                      onChange={(e) =>
+                        handleRowChange(index, 'productName', e.target.value)
+                      }
+                      displayEmpty
+                      fullWidth
+                    >
+                      <MenuItem value="">
+                        <em>Select Product</em>
+                      </MenuItem>
+                      <MenuItem value="Product 1">Product 1</MenuItem>
+                      <MenuItem value="Product 2">Product 2</MenuItem>
+                      <MenuItem value="Product 3">Product 3</MenuItem>
+                    </Select>
+                  </TableCell>
+                  <TableCell>
+                    <TextField
+                      type="number"
+                      value={row.count}
+                      onChange={(e) =>
+                        handleRowChange(index, 'count', e.target.value)
+                      }
+                      fullWidth
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <TextField
+                      type="number"
+                      value={row.purchasingPrice}
+                      onChange={(e) =>
+                        handleRowChange(index, 'purchasingPrice', e.target.value)
+                      }
+                      fullWidth
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Button
+                      variant="contained"
+                      color="secondary"
+                      onClick={() => handleDeleteRow(index)}
+                    >
+                      Delete
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
           </TableBody>
         </Table>
       </TableContainer>
@@ -118,6 +150,14 @@ function AddStock() {
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
       />
+      <div style={{ display: 'flex', justifyContent: 'space-between', padding: '16px' }}>
+        <Button variant="contained" onClick={handleAddRow}>
+          Add Row
+        </Button>
+        <Button variant="contained" color="primary" onClick={handleSubmit}>
+          Submit
+        </Button>
+      </div>
     </Paper>
   );
 }

@@ -21,15 +21,21 @@ const columns = [
   { id: 'number', label: 'Number', minWidth: 50 },
   { id: 'stockId', label: 'Stock ID', minWidth: 150 },
   { id: 'productName', label: 'Product Name', minWidth: 150 },
-  { id: 'releaseCount', label: 'Release Count', minWidth: 100 },
+  { id: 'count', label: 'Count', minWidth: 100 },
+  { id: 'purchasingPrice', label: 'Purchasing Price', minWidth: 150 },
   { id: 'actions', label: 'Actions', minWidth: 200 },
 ];
 
-function ReleaseStock() {
-  const [rows, setRows] = React.useState([
-    { number: 1, stockId: 'RFID123', productName: 'Product 1', releaseCount: '' },
-    { number: 2, stockId: 'RFID124', productName: 'Product 2', releaseCount: '' },
-  ]);
+// Dummy data for testing
+const dummyData = [
+  { number: 1, stockId: 'STK001', productName: 'Product 1', count: 10, purchasingPrice: 100 },
+  { number: 2, stockId: 'STK002', productName: 'Product 2', count: 20, purchasingPrice: 200 },
+  { number: 3, stockId: 'STK003', productName: 'Product 3', count: 15, purchasingPrice: 150 },
+  { number: 4, stockId: 'STK004', productName: 'Product 4', count: 30, purchasingPrice: 300 },
+];
+
+function ViewEditStock() {
+  const [rows, setRows] = React.useState(dummyData); // Initialize rows with dummy data
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [editIndex, setEditIndex] = React.useState(null);
@@ -40,24 +46,6 @@ function ReleaseStock() {
       i === index ? { ...row, [field]: value } : row
     );
     setRows(updatedRows);
-  };
-
-  const handleAddRow = () => {
-    setRows((prevRows) => [
-      ...prevRows,
-      {
-        number: prevRows.length + 1,
-        stockId: 'Auto-generated',
-        productName: '',
-        releaseCount: '0', // Default release count
-      },
-    ]);
-  };
-
-  const handleAddRowOnEnter = (index) => {
-    if (index === rows.length - 1) {
-      handleAddRow();
-    }
   };
 
   const handleDeleteRow = () => {
@@ -97,16 +85,6 @@ function ReleaseStock() {
     setConfirmDelete({ open: false, index: null });
   };
 
-  const handleSubmit = () => {
-    const invalidRows = rows.filter((row) => row.releaseCount === '' || row.releaseCount <= 0);
-    if (invalidRows.length > 0) {
-      alert('Please ensure all rows have a valid release count before submitting.');
-      return;
-    }
-    console.log('Released rows:', rows);
-    // Logic to submit the release stock data to the backend
-  };
-
   return (
     <Paper sx={{ width: '100%', overflow: 'hidden' }}>
       <TableContainer sx={{ maxHeight: 440 }}>
@@ -124,10 +102,7 @@ function ReleaseStock() {
             {rows
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((row, index) => (
-                <TableRow
-                  key={index}
-                  onKeyDown={(e) => e.key === 'Enter' && handleAddRowOnEnter(index)}
-                >
+                <TableRow key={index}>
                   <TableCell>{row.number}</TableCell>
                   <TableCell>{row.stockId}</TableCell>
                   <TableCell>
@@ -144,41 +119,36 @@ function ReleaseStock() {
                         <MenuItem value="Product 1">Product 1</MenuItem>
                         <MenuItem value="Product 2">Product 2</MenuItem>
                         <MenuItem value="Product 3">Product 3</MenuItem>
+                        <MenuItem value="Product 4">Product 4</MenuItem>
                       </Select>
                     ) : (
                       row.productName
                     )}
                   </TableCell>
-                  
                   <TableCell>
-                  {editIndex === index ? (
-                    <TextField
-                      type="number"
-                      value={row.releaseCount}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        if (value >= 0) {
-                          handleRowChange(index, 'releaseCount', value);
-                        }
-                      }}
-                      fullWidth
-                      placeholder="Enter Release Count"
-                    />
-                  ) : (
-                    <>
-                      
+                    {editIndex === index ? (
                       <TextField
                         type="number"
-                        value={row.releaseCount || ''}
-                        onChange={(e) => handleRowChange(index, 'releaseCount', e.target.value)}
-                        placeholder="Add Release Count"
-                        size="small"
-                        style={{ marginLeft: '8px' }}
+                        value={row.count}
+                        onChange={(e) => handleRowChange(index, 'count', e.target.value)}
+                        fullWidth
                       />
-                    </>
-                  )}
-                </TableCell>
-
+                    ) : (
+                      row.count
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {editIndex === index ? (
+                      <TextField
+                        type="number"
+                        value={row.purchasingPrice}
+                        onChange={(e) => handleRowChange(index, 'purchasingPrice', e.target.value)}
+                        fullWidth
+                      />
+                    ) : (
+                      row.purchasingPrice
+                    )}
+                  </TableCell>
                   <TableCell>
                     {editIndex === index ? (
                       <>
@@ -218,14 +188,6 @@ function ReleaseStock() {
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
       />
-      <div style={{ display: 'flex', justifyContent: 'space-between', padding: '16px' }}>
-        <Button variant="contained" onClick={handleAddRow}>
-          Add Row
-        </Button>
-        <Button variant="contained" color="primary" onClick={handleSubmit}>
-          Release
-        </Button>
-      </div>
       <Dialog
         open={confirmDelete.open}
         onClose={closeConfirmDelete}
@@ -251,4 +213,4 @@ function ReleaseStock() {
   );
 }
 
-export default ReleaseStock;
+export default ViewEditStock;
