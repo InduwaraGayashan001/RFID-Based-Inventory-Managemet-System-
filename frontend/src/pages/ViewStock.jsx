@@ -20,6 +20,7 @@ import Typography from '@mui/material/Typography';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SaveIcon from '@mui/icons-material/Save';
+import axios from 'axios';
 
 const columns = [
   { id: 'number', label: 'Number', minWidth: 50 },
@@ -30,19 +31,33 @@ const columns = [
   { id: 'actions', label: 'Actions', minWidth: 200 },
 ];
 
-// Mock data
-const initialRows = [
-  { number: 1, stockId: 'S001', productName: 'Product 1', count: 10, purchasingPrice: 100 },
-  { number: 2, stockId: 'S002', productName: 'Product 2', count: 15, purchasingPrice: 150 },
-  { number: 3, stockId: 'S003', productName: 'Product 3', count: 8, purchasingPrice: 120 },
-];
+const API_BASE_URL = 'http://localhost:8080/api/stocks';
 
 function ViewStock() {
-  const [rows, setRows] = React.useState(initialRows);
+  const [rows, setRows] = React.useState([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [editIndex, setEditIndex] = React.useState(null);
   const [confirmDelete, setConfirmDelete] = React.useState({ open: false, index: null });
+
+  React.useEffect(() => {
+    axios.get(API_BASE_URL)
+      .then(response => {
+        const products = response.data.map((product, index) => ({
+          number: index + 1, // Serial number
+          stockId: product.rfid, // Mapped from productId
+          productName: product.productId, // Assuming rfid is used as product name
+          count: product.quantity, // Mapped from quantity
+          purchasingPrice: product.stockPrice, // Mapped from stockPrice
+        }));
+        console.log(products); // Debugging
+        setRows(products); // Update state with mapped data
+      })
+      .catch(error => {
+        console.error('Error fetching products:', error);
+      });
+  }, []);
+  
 
   const handleRowChange = (index, field, value) => {
     const updatedRows = rows.map((row, i) =>
@@ -52,20 +67,47 @@ function ViewStock() {
   };
 
   const handleDeleteRow = () => {
-    const updatedRows = rows
-      .filter((_, i) => i !== confirmDelete.index)
-      .map((row, i) => ({ ...row, number: i + 1 }));
-    setRows(updatedRows);
-    setConfirmDelete({ open: false, index: null });
+    const productId = rows[confirmDelete.index].stockId;
+    axios.delete(`${API_BASE_URL}/${productId}`)
+      .then(() => {
+        const updatedRows = rows
+          .filter((_, i) => i !== confirmDelete.index)
+          .map((row, i) => ({ ...row, number: i + 1 }));
+        setRows(updatedRows);
+        setConfirmDelete({ open: false, index: null });
+      })
+      .catch(error => {
+        console.error('There was an error deleting the product!', error);
+      });
   };
 
   const handleEdit = (index) => {
     setEditIndex(index);
   };
 
+  // 
   const handleSave = () => {
-    setEditIndex(null);
+    const updatedProduct = rows[editIndex];
+    
+    // Prepare the correct payload based on the original mapping
+    const payload = {
+      rfid: updatedProduct.stockId, // Mapped back to rfid
+      productId: updatedProduct.productName, // Mapped back to productId
+      quantity: updatedProduct.count, // Mapped back to quantity
+      stockPrice: updatedProduct.purchasingPrice, // Mapped back to stockPrice
+    };
+  
+    // Make the PUT request with the correct URL and payload
+    axios.put(`${API_BASE_URL}/${updatedProduct.stockId}`, payload)
+      .then(() => {
+        console.log('Product updated successfully:', payload);
+        setEditIndex(null); // Exit edit mode
+      })
+      .catch(error => {
+        console.error('There was an error updating the product!', error);
+      });
   };
+  
 
   const handleCancelEdit = () => {
     setEditIndex(null);
@@ -87,6 +129,24 @@ function ViewStock() {
   const closeConfirmDelete = () => {
     setConfirmDelete({ open: false, index: null });
   };
+
+
+  const getProducts = async () => {
+    try {
+      const response = await axios.get('http://localhost:8080/api/products');
+      const products = response.data.map((product) => ({
+        productName: product.productName,
+      }));
+      console.log(products); // Debugging, remove if not needed
+      return products; // Add this if you need the result elsewhere
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    }
+  };
+  
+
+
+
 
   return (
     <Paper sx={{ width: '100%', overflow: 'hidden' }}>
@@ -116,7 +176,7 @@ function ViewStock() {
               ))}
             </TableRow>
           </TableHead>
-          <TableBody>
+          {/* <TableBody>
             {rows
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((row, index) => (
@@ -162,7 +222,53 @@ function ViewStock() {
                     ) : (
                       row.purchasingPrice
                     )}
-                  </TableCell>
+                  </TableCell> */}
+
+
+<TableBody>
+  {rows
+    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+    .map((row, index) => (
+      <TableRow key={index}>
+        <TableCell>{row.number}</TableCell>
+        <TableCell>{row.stockId}</TableCell>
+        <TableCell>
+          {editIndex === index ? (
+            <TextField
+              value={row.productName}
+              onChange={(e) => handleRowChange(index, 'productName', e.target.value)}
+              fullWidth
+            />
+          ) : (
+            row.productName
+          )}
+        </TableCell>
+        <TableCell>
+          {editIndex === index ? (
+            <TextField
+              type="number"
+              value={row.count}
+              onChange={(e) => handleRowChange(index, 'count', e.target.value)}
+              fullWidth
+            />
+          ) : (
+            row.count
+          )}
+        </TableCell>
+        <TableCell>
+          {editIndex === index ? (
+            <TextField
+              type="number"
+              value={row.purchasingPrice}
+              onChange={(e) => handleRowChange(index, 'purchasingPrice', e.target.value)}
+              fullWidth
+            />
+          ) : (
+            row.purchasingPrice
+          )}
+        </TableCell>
+
+        
                   <TableCell>
   {editIndex === index ? (
     <>

@@ -18,6 +18,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import DeleteIcon from '@mui/icons-material/Delete';
+import axios from 'axios';
 
 const columns = [
   { id: 'number', label: 'Number', minWidth: 50 },
@@ -88,6 +89,116 @@ function AddStock() {
     setRowsPerPage(+event.target.value);
     setPage(0);
   };
+
+// const columns = [
+//   { id: 'number', label: 'Number', minWidth: 50 },
+//   { id: 'stockId', label: 'Stock ID', minWidth: 150 },
+//   { id: 'productName', label: 'Product Name', minWidth: 150 },
+//   { id: 'count', label: 'Count', minWidth: 100 },
+//   { id: 'purchasingPrice', label: 'Purchasing Price', minWidth: 150 },
+//   { id: 'actions', label: 'Actions', minWidth: 100 },
+// ];
+
+// function AddStock() {
+//   const [rows, setRows] = React.useState([]);
+//   const [page, setPage] = React.useState(0);
+//   const [rowsPerPage, setRowsPerPage] = React.useState(10);
+//   const [confirmDelete, setConfirmDelete] = React.useState({ open: false, index: null });
+
+//   React.useEffect(() => {
+//     const fetchStocks = async () => {
+//       try {
+//         const response = await api.get('/stocks');
+//         setRows(response.data);
+//       } catch (error) {
+//         console.error('Error fetching stock data:', error);
+//       }
+//     };
+//     fetchStocks();
+//   }, []);
+
+//   const handleAddRow = async () => {
+//     try {
+//       const response = await api.post('/stocks', {
+//         number: rows.length + 1,
+//         stockId: 'Auto-generated',
+//         productName: '',
+//         count: '',
+//         purchasingPrice: '',
+//       });
+//       setRows((prevRows) => [...prevRows, response.data]);
+//     } catch (error) {
+//       console.error('Error adding new stock:', error);
+//       alert('Failed to add new stock.');
+//     }
+//   };
+
+//   const handleRowChange = async (index, field, value) => {
+//     const updatedRows = rows.map((row, i) =>
+//       i === index ? { ...row, [field]: value } : row
+//     );
+//     setRows(updatedRows);
+
+//     const stock = updatedRows[index];
+//     if (stock.stockId !== 'Auto-generated') {
+//       try {
+//         await api.put(`/stocks/${stock.stockId}`, stock);
+//       } catch (error) {
+//         console.error('Error updating stock:', error);
+//       }
+//     }
+//   };
+
+//   const handleDeleteRow = async () => {
+//     const stockId = rows[confirmDelete.index]?.stockId;
+//     try {
+//       if (stockId !== 'Auto-generated') {
+//         await api.delete(`/stocks/${stockId}`);
+//       }
+//       const updatedRows = rows
+//         .filter((_, i) => i !== confirmDelete.index)
+//         .map((row, i) => ({ ...row, number: i + 1 }));
+//       setRows(updatedRows);
+//       closeConfirmDelete();
+//     } catch (error) {
+//       console.error('Error deleting stock:', error);
+//       alert('Failed to delete stock.');
+//     }
+//   };
+
+//   const openConfirmDelete = (index) => {
+//     setConfirmDelete({ open: true, index });
+//   };
+
+//   const closeConfirmDelete = () => {
+//     setConfirmDelete({ open: false, index: null });
+//   };
+
+//   const handleSubmit = async () => {
+//     const invalidRows = rows.filter((row) => row.count === '' || row.count <= 0);
+//     if (invalidRows.length > 0) {
+//       alert('Please ensure all rows have a valid stock count before submitting.');
+//       return;
+//     }
+
+//     try {
+//       await api.post('/stocks', rows);
+//       alert('Stocks added successfully!');
+//       setRows([]);
+//     } catch (error) {
+//       console.error('Error submitting stock data:', error);
+//       alert('Failed to submit stock data.');
+//     }
+//   };
+
+//   const handleChangePage = (event, newPage) => {
+//     setPage(newPage);
+//   };
+
+//   const handleChangeRowsPerPage = (event) => {
+//     setRowsPerPage(+event.target.value);
+//     setPage(0);
+//   };
 
   return (
     <Paper sx={{ width: '100%', overflow: 'hidden' }}>
