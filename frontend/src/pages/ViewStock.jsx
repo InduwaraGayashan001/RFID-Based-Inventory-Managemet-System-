@@ -43,6 +43,7 @@ function ViewStock() {
   const [selectedProduct, setSelectedProduct] = React.useState('');
   const [zeroProductDialogOpen, setZeroProductDialogOpen] = React.useState(false);
 
+
   React.useEffect(() => {
     axios.get(API_BASE_URL)
       .then(response => {
@@ -69,9 +70,6 @@ function ViewStock() {
     setRows(updatedRows);
   };
 
-  
-  
-
   const handleDeleteRow = () => {
     const productId = rows[confirmDelete.index].stockId;
     axios.delete(`${API_BASE_URL}/${productId}`)
@@ -86,10 +84,6 @@ function ViewStock() {
         console.error('There was an error deleting the product!', error);
       });
   };
-
-  // const handleEdit = (index) => {
-  //   setEditIndex(index);
-  // };
 
 const handleEdit = (index) => {
   console.log(rows[index].productName); // Debugging
@@ -163,14 +157,17 @@ const closeZeroProductDialog = () => {
   
   const myProduct = async (value) => {
     try {
-      console.log("Selected Product:", value);
       const products = await getProducts();
       const selected = products.find((product) => product.productName === value);
+   
       console.log(selected);
       if (selected) {
+        console.log("Selected Product:", selected.productName);
         console.log("Selected Product ID:", selected.Pid);
+        
         setSelectedProduct(selected.Pid); // Assuming Pid is the value you want to store
         console.log("Selected Product PID:", selectedProduct);
+        console.log("Selected Product is:",selectedProduct);
       } else {
         console.warn("Product not found!");
       }
@@ -178,6 +175,7 @@ const closeZeroProductDialog = () => {
       console.error("Error fetching products:", error);
     }
   };
+
 
   React.useEffect(() => {
     const fetchProducts = async () => {
@@ -191,6 +189,42 @@ const closeZeroProductDialog = () => {
     fetchProducts();
   }, []);
   
+  // const fetchProducts = async () => {
+  //   try {
+  //     const response = await axios.get(API_BASE_URL);
+  //     const products = response.data.map((product, index) => ({
+  //       number: index + 1, // Serial number
+  //       stockId: product.rfid, // Mapped from productId
+  //       productName: product.productId, // Assuming rfid is used as product name
+  //       count: product.quantity, // Mapped from quantity
+  //       purchasingPrice: product.stockPrice, // Mapped from stockPrice
+  //     }));
+  //     console.log(products); // Debugging
+  //     setRows(products); // Update state with mapped data
+  //   } catch (error) {
+  //     console.error('Error fetching products:', error);
+  //   }
+  // };
+
+  const fetchProducts = async (rfid) => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/${rfid}`); // Fetch only the data for the given rfid
+      const updatedProduct = {
+        number: rows.findIndex((row) => row.stockId === rfid) + 1, // Serial number (existing index + 1)
+        stockId: response.data.rfid, // Mapped from productId
+        productName: response.data.productId, // Assuming rfid is used as product name
+        count: response.data.quantity, // Mapped from quantity
+        purchasingPrice: response.data.stockPrice, // Mapped from stockPrice
+      };
+      setRows((prevRows) =>
+        prevRows.map((row) =>
+          row.stockId === rfid ? updatedProduct : row // Replace only the matching row
+        )
+      );
+    } catch (error) {
+        console.error('Error fetching products:', error);
+    }
+ };
 
   const handleSave = () => {
     const updatedProduct = rows[editIndex];
@@ -210,12 +244,14 @@ const closeZeroProductDialog = () => {
     axios.put(`${API_BASE_URL}/${updatedProduct.stockId}`, payload)
       .then(() => {
         console.log('Product updated successfully:', payload);
+        fetchProducts(updatedProduct.stockId);
         setEditIndex(null); // Exit edit mode
         
       })
       .catch(error => {
         console.error('There was an error updating the product!', error);
       });
+      
   };
   
 
@@ -308,31 +344,24 @@ const closeZeroProductDialog = () => {
         <TableCell>{row.stockId}</TableCell>
         <TableCell>
           {editIndex === index ? (
-            <Select
+            <Select 
             value={selectedProduct}
+            placeholder="Product"
             onChange={(e) => myProduct(e.target.value)}
             displayEmpty
             fullWidth
           >
-          
             <MenuItem value="" disabled>
               Select a Product
             </MenuItem>
+
             {productOptions.map((product, idx) => (
               <MenuItem key={idx} value={product.productName}>
                  {product.productName} 
               </MenuItem>
               
             ))}
-           
           </Select>
-       
-
-            // <TextField
-            //   value={row.productName}
-            //   onChange={(e) => handleRowChange(index, 'productName', e.target.value)}
-            //   fullWidth
-            // />
           ) : (
             row.productName
           )}
