@@ -2,6 +2,7 @@ package org.inventrfid.backend.controller;
 
 import org.inventrfid.backend.dto.StockDTO;
 import org.inventrfid.backend.entity.Stock;
+import org.inventrfid.backend.service.ProductService;
 import org.inventrfid.backend.service.StockService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,8 @@ public class StockController {
 
     @Autowired
     private StockService stockService;
+    @Autowired
+    private ProductService productService;
 
     // Get all stocks
     @GetMapping

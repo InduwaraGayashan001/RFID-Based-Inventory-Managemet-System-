@@ -4,7 +4,7 @@ package org.inventrfid.backend.entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "Product")
+@Table(name = "product")
 public class Product {
 
     @Id
