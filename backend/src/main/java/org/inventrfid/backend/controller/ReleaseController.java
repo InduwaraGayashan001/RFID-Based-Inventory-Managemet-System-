@@ -44,5 +44,11 @@ public class ReleaseController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping
+    public ResponseEntity<ReleaseDTO> createRelease(@RequestBody ReleaseDTO releaseDto) {
+        ReleaseDTO createdRelease = releaseService.createRelease(releaseDto);
+        return ResponseEntity.ok(createdRelease);
+    }
+
 }
 
