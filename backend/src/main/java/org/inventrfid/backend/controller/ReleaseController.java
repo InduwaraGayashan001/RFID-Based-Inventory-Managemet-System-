@@ -9,14 +9,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.List;
-
 @RestController
 @RequestMapping("/api/releases")
 public class ReleaseController {
-
     @Autowired
     private final ReleaseService releaseService;
-
     public ReleaseController(ReleaseService releaseService) {
         this.releaseService = releaseService;
     }
@@ -33,7 +30,6 @@ public class ReleaseController {
         return releaseService.mapToDto(release);
     }
 
-
     @PutMapping("/{transactionId}")
     public ReleaseDTO updateRelease(
             @PathVariable Long transactionId,
@@ -47,8 +43,6 @@ public class ReleaseController {
         releaseService.deleteRelease(id);
         return ResponseEntity.noContent().build();
     }
-
-
 
 }
 

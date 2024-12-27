@@ -50,5 +50,7 @@ public class StockDTO {
     public void setStockPrice(BigDecimal stockPrice) {
         this.stockPrice = stockPrice;
     }
+
+
 }
 

@@ -18,11 +18,84 @@ import AddProductPopup from '../components/AddProductPopup'; // Import the AddPr
 import Typography from '@mui/material/Typography';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import axios from 'axios';
+import { useEffect } from 'react';
+
+// const columns = [
+//   { id: 'productId', label: 'Product ID', minWidth: 150 },
+//   { id: 'productName', label: 'Product Name', minWidth: 150 },
+//   { id: 'actions', label: 'Actions', minWidth: 200 }, // Add Actions column
+// ];
+
+// function ViewProduct() {
+//   const [rows, setRows] = React.useState([]);
+//   const [page, setPage] = React.useState(0);
+//   const [rowsPerPage, setRowsPerPage] = React.useState(10);
+//   const [openAddPopup, setOpenAddPopup] = React.useState(false);
+//   const [confirmDelete, setConfirmDelete] = React.useState({ open: false, index: null });
+//   const [editDialog, setEditDialog] = React.useState({ open: false, index: null, productName: '' });
+
+//   const handleChangePage = (event, newPage) => {
+//     setPage(newPage);
+//   };
+
+//   const handleChangeRowsPerPage = (event) => {
+//     setRowsPerPage(+event.target.value);
+//     setPage(0);
+//   };
+
+//   const handleOpenAddPopup = () => {
+//     setOpenAddPopup(true);
+//   };
+
+//   const handleCloseAddPopup = () => {
+//     setOpenAddPopup(false);
+//   };
+
+//   const addNewProduct = (product) => {
+//     setRows([...rows, product]);
+//     handleCloseAddPopup();
+//   };
+
+//   const openConfirmDelete = (index) => {
+//     setConfirmDelete({ open: true, index });
+//   };
+
+//   const closeConfirmDelete = () => {
+//     setConfirmDelete({ open: false, index: null });
+//   };
+
+//   const handleDeleteRow = () => {
+//     const newRows = rows.filter((_, i) => i !== confirmDelete.index);
+//     setRows(newRows);
+//     closeConfirmDelete();
+//   };
+
+//   const handleEdit = (index) => {
+//     const productToEdit = rows[index];
+//     setEditDialog({ open: true, index, productName: productToEdit.productName });
+//   };
+
+//   const closeEditDialog = () => {
+//     setEditDialog({ open: false, index: null, productName: '' });
+//   };
+
+//   const handleEditChange = (event) => {
+//     setEditDialog((prev) => ({ ...prev, productName: event.target.value }));
+//   };
+
+//   const saveEdit = () => {
+//     const updatedRows = [...rows];
+//     updatedRows[editDialog.index].productName = editDialog.productName;
+//     setRows(updatedRows);
+//     closeEditDialog();
+//   };
 
 const columns = [
+  { id: 'number', label: 'No', minWidth: 50 },
   { id: 'productId', label: 'Product ID', minWidth: 150 },
   { id: 'productName', label: 'Product Name', minWidth: 150 },
-  { id: 'actions', label: 'Actions', minWidth: 200 }, // Add Actions column
+  { id: 'actions', label: 'Actions', minWidth: 200 },
 ];
 
 function ViewProduct() {
@@ -32,6 +105,26 @@ function ViewProduct() {
   const [openAddPopup, setOpenAddPopup] = React.useState(false);
   const [confirmDelete, setConfirmDelete] = React.useState({ open: false, index: null });
   const [editDialog, setEditDialog] = React.useState({ open: false, index: null, productName: '' });
+
+  const API_BASE_URL = 'http://localhost:8080/api/products';
+
+  useEffect(() => {
+    // Fetch products on component mount
+    const fetchProducts = async () => {
+      try {
+        const response = await axios.get(API_BASE_URL);
+        const products = response.data.map((product, index) => ({
+          number: index + 1,
+          productId: product.pid,
+          productName: product.productName,
+        }));
+        setRows(products);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      }
+    };
+    fetchProducts();
+  }, []);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -50,10 +143,28 @@ function ViewProduct() {
     setOpenAddPopup(false);
   };
 
-  const addNewProduct = (product) => {
-    // Assuming `product` contains { productId, productName }
-    setRows([...rows, product]);
-    handleCloseAddPopup();
+  const fetchProducts = async () => {
+    try {
+      const response = await axios.get(API_BASE_URL);
+      const products = response.data.map((product, index) => ({
+        number: index + 1,
+        productId: product.pid,
+        productName: product.productName,
+      }));
+      setRows(products);
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    }
+  };
+
+  const addNewProduct = async (product) => {
+    try {
+      const response = await axios.post(API_BASE_URL, product);
+      fetchProducts();
+      handleCloseAddPopup();
+    } catch (error) {
+      console.error('Error adding product:', error);
+    }
   };
 
   const openConfirmDelete = (index) => {
@@ -64,10 +175,15 @@ function ViewProduct() {
     setConfirmDelete({ open: false, index: null });
   };
 
-  const handleDeleteRow = () => {
-    const newRows = rows.filter((_, i) => i !== confirmDelete.index);
-    setRows(newRows);
-    closeConfirmDelete();
+  const handleDeleteRow = async () => {
+    const productToDelete = rows[confirmDelete.index];
+    try {
+      await axios.delete(`${API_BASE_URL}/${productToDelete.productId}`);
+      fetchProducts();
+      closeConfirmDelete();
+    } catch (error) {
+      console.error('Error deleting product:', error);
+    }
   };
 
   const handleEdit = (index) => {
@@ -83,11 +199,15 @@ function ViewProduct() {
     setEditDialog((prev) => ({ ...prev, productName: event.target.value }));
   };
 
-  const saveEdit = () => {
-    const updatedRows = [...rows];
-    updatedRows[editDialog.index].productName = editDialog.productName;
-    setRows(updatedRows);
-    closeEditDialog();
+  const saveEdit = async () => {
+    const updatedProduct = { ...rows[editDialog.index], productId: rows[editDialog.index].productId, productName: editDialog.productName };
+    try {
+      await axios.put(`${API_BASE_URL}/${updatedProduct.productId}`, updatedProduct);
+      fetchProducts();
+      closeEditDialog();
+    } catch (error) {
+      console.error('Error editing product:', error);
+    }
   };
 
   return (
@@ -125,6 +245,7 @@ function ViewProduct() {
     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
     .map((row, index) => (
       <TableRow key={index}>
+        <TableCell>{row.number}</TableCell>
         <TableCell>{row.productId}</TableCell>
         <TableCell>{row.productName}</TableCell>
         <TableCell>

@@ -2,6 +2,7 @@ package org.inventrfid.backend.controller;
 
 import org.inventrfid.backend.dto.StockDTO;
 import org.inventrfid.backend.entity.Stock;
+import org.inventrfid.backend.service.ProductService;
 import org.inventrfid.backend.service.StockService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,8 @@ public class StockController {
 
     @Autowired
     private StockService stockService;
+    @Autowired
+    private ProductService productService;
 
     // Get all stocks
     @GetMapping
@@ -34,7 +37,7 @@ public class StockController {
     // Update stock
     @PutMapping("/{rfid}")
     public StockDTO updateStock(@PathVariable String rfid, @RequestBody StockDTO stockDTO) {
-        Stock updatedStock = stockService.updateStock(rfid, stockDTO.getQuantity(), stockDTO.getProductId(),stockDTO.getStockPrice());
+        Stock updatedStock = stockService.updateStock(rfid, stockDTO.getQuantity(), stockDTO.getProductId(), stockDTO.getStockPrice());
         return stockService.mapToDto(updatedStock);
     }
 
@@ -43,6 +46,12 @@ public class StockController {
     public void deleteStock(@PathVariable String rfid) {
         stockService.deleteStock(rfid);
     }
+
+
+    // Get the last stock item
+    @GetMapping("/last")
+    public StockDTO getLastStock() {
+        Stock stock = stockService.getLastStock();
+        return stockService.mapToDto(stock);
+    }
 }
-
-
