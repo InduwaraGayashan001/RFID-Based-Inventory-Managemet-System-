@@ -25,8 +25,10 @@ public class StockService {
     // Method to create a new stock when an MQTT message is received
     public Stock createStockFromMqtt(String rfid) {
         Stock stock = new Stock();
+
         stock.setRfid(rfid);// Default stock price as 0
         stock.setTimestamp(new Date());
+
         return stockRepository.save(stock);
     }
 

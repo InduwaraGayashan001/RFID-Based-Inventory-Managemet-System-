@@ -2,12 +2,15 @@ package org.inventrfid.backend.dto;
 
 import java.math.BigDecimal;
 import java.util.Date;
+
 public class ReleaseDTO {
+
     private Long transactionId;
     private String rfid;
     private int releaseQuantity;
     private BigDecimal releasePrice;
     private Date timestamp;
+
     // Getters and Setters
     public Long getTransactionId() {
         return transactionId;
