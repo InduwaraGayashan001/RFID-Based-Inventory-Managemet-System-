@@ -13,13 +13,14 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import axios from 'axios';
 
-const API_LAST_ITEM_URL = 'http://localhost:8080/api/releases';
-const API_BASE_URL = 'http://localhost:8080/api/stocks';
+const API_RRELEASE_URL = 'http://localhost:8080/api/releases';
+const API_LAST_ITEM_URL = 'http://localhost:8080/api/stocks/last';
 
 function ReleaseStock() {
   const [stock, setStock] = React.useState(null);
   const [productOptions, setProductOptions] = React.useState([]);
   const [selectedProduct, setSelectedProduct] = React.useState('');
+
 
   React.useEffect(() => {
     // Fetch the latest stock item
@@ -29,28 +30,33 @@ function ReleaseStock() {
         const product = response.data;
         setStock({
           stockId: product.rfid,
-          productName: product.productId,
+          productId: product.productId,
           count: product.quantity,
           purchasingPrice: product.stockPrice,
           
         });
-        
+      
         setSelectedProduct(product.productId); // Set the default selected product
+        console.log('Selected product:', selectedProduct);
+        
       })
       .catch((error) => {
         console.error('Error fetching the latest stock:', error);
       });
 
     // Fetch product options for dropdown
-    axios
-      .get('http://localhost:8080/api/products')
-      .then((response) => {
-        setProductOptions(response.data);
-      })
-      .catch((error) => {
-        console.error('Error fetching product options:', error);
-      });
-  }, []);
+     // Fetch product options for dropdown
+     axios
+     .get('http://localhost:8080/api/products')
+     .then((response) => {
+       setProductOptions(response.data);
+       console.log('Product options:', response.data);
+       
+     })
+     .catch((error) => {
+       console.error('Error fetching product options:', error);
+     });
+    }, []);
 
   const handleFieldChange = (field, value) => {
     setStock((prevStock) => ({
@@ -59,23 +65,10 @@ function ReleaseStock() {
     }));
   };
 
-  const handleProductChange = (value) => {
-    setSelectedProduct(value);
-    console.log('Selected product:', value);
-    const product = productOptions.find((product) => product.productName === value);
-    console.log('Product:', product);
-    console.log('Product ID:', product.pid);
-    setSelectedProduct(product.pid);
-    alert(` ${product.productName} selected Click on Submit to add the stock`);
-
-  };
+  
 
   const handleSubmit = () => {
-    if (!selectedProduct) {
-      alert('Please select a product.');
-      return;
-    }
-
+    
     if (stock.count <= 0 || stock.purchasingPrice <= 0) {
       alert('Please provide valid count and purchasing price.');
       return;
@@ -125,7 +118,7 @@ function ReleaseStock() {
           <TableHead>
             <TableRow>
               <TableCell>Stock ID</TableCell>
-              <TableCell>Product Name</TableCell>
+              <TableCell>Product ID</TableCell>
               <TableCell>Count</TableCell>
               <TableCell>Purchasing Price</TableCell>
             </TableRow>
@@ -133,11 +126,11 @@ function ReleaseStock() {
           <TableBody>
             <TableRow>
               <TableCell>{stock.stockId}</TableCell>
-              <TableCell>{stock.productName}</TableCell>
+              <TableCell>{stock.productId}</TableCell>
               <TableCell>
                 <TextField
                   type="number"
-                  value={stock.count}
+                  value= {stock.count}
                   onChange={(e) => handleFieldChange('count', e.target.value)}
                   fullWidth
                 />
