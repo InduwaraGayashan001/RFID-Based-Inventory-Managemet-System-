@@ -5,205 +5,112 @@ import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
-import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import TextField from '@mui/material/TextField';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
-import DeleteIcon from '@mui/icons-material/Delete';
 import axios from 'axios';
 
-const columns = [
-  { id: 'number', label: 'Number', minWidth: 50 },
-  { id: 'stockId', label: 'Stock ID', minWidth: 150 },
-  { id: 'productName', label: 'Product Name', minWidth: 150 },
-  { id: 'count', label: 'Count', minWidth: 100 },
-  { id: 'purchasingPrice', label: 'Purchasing Price', minWidth: 150 },
-  { id: 'actions', label: 'Actions', minWidth: 100 },
-];
+const API_LAST_ITEM_URL = 'http://localhost:8080/api/stocks/last';
+const API_BASE_URL = 'http://localhost:8080/api/stocks';
 
 function AddStock() {
-  const [rows, setRows] = React.useState([]);
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
-  const [confirmDelete, setConfirmDelete] = React.useState({ open: false, index: null });
+  const [stock, setStock] = React.useState(null);
+  const [productOptions, setProductOptions] = React.useState([]);
+  const [selectedProduct, setSelectedProduct] = React.useState('');
 
-  const handleAddRow = () => {
-    setRows((prevRows) => [
-      ...prevRows,
-      {
-        number: prevRows.length + 1,
-        stockId: 'Auto-generated',
-        productName: '',
-        count: '',
-        purchasingPrice: '',
-      },
-    ]);
+  React.useEffect(() => {
+    // Fetch the latest stock item
+    axios
+      .get(API_LAST_ITEM_URL)
+      .then((response) => {
+        const product = response.data;
+        setStock({
+          stockId: product.rfid,
+          productName: product.productId,
+          count: product.quantity,
+          purchasingPrice: product.stockPrice,
+          
+        });
+        if (product.productId !== 0) {
+          alert('Current scanned RFID related stock ' + product.rfid + ' already added. Redirecting to view Stock Page. Scan new RFID and try again.');
+          window.location.href = '/view-stock'; // Redirect to /view-stock
+          return;
+        };
+        
+        setSelectedProduct(product.productId); // Set the default selected product
+      })
+      .catch((error) => {
+        console.error('Error fetching the latest stock:', error);
+      });
+
+    // Fetch product options for dropdown
+    axios
+      .get('http://localhost:8080/api/products')
+      .then((response) => {
+        setProductOptions(response.data);
+      })
+      .catch((error) => {
+        console.error('Error fetching product options:', error);
+      });
+  }, []);
+
+  const handleFieldChange = (field, value) => {
+    setStock((prevStock) => ({
+      ...prevStock,
+      [field]: value,
+    }));
   };
 
-  const handleRowChange = (index, field, value) => {
-    const updatedRows = rows.map((row, i) =>
-      i === index ? { ...row, [field]: value } : row
-    );
-    setRows(updatedRows);
-  };
+  const handleProductChange = (value) => {
+    setSelectedProduct(value);
+    console.log('Selected product:', value);
+    const product = productOptions.find((product) => product.productName === value);
+    console.log('Product:', product);
+    console.log('Product ID:', product.pid);
+    setSelectedProduct(product.pid);
+    alert(` ${product.productName} selected Click on Submit to add the stock`);
 
-  const handleDeleteRow = () => {
-    const updatedRows = rows
-      .filter((_, i) => i !== confirmDelete.index)
-      .map((row, i) => ({ ...row, number: i + 1 }));
-    setRows(updatedRows);
-    closeConfirmDelete();
-  };
-
-  const openConfirmDelete = (index) => {
-    setConfirmDelete({ open: true, index });
-  };
-
-  const closeConfirmDelete = () => {
-    setConfirmDelete({ open: false, index: null });
   };
 
   const handleSubmit = () => {
-    const invalidRows = rows.filter((row) => row.count === '' || row.count <= 0);
-    if (invalidRows.length > 0) {
-      alert('Please ensure all rows have a valid stock count before submitting.');
+    if (!selectedProduct) {
+      alert('Please select a product.');
       return;
     }
-    console.log('Released rows:', rows);
-    // Logic to submit the release stock data to the backend
+
+    if (stock.count <= 0 || stock.purchasingPrice <= 0) {
+      alert('Please provide valid count and purchasing price.');
+      return;
+    }
+
+    const payload = {
+      rfid: stock.stockId,
+      productId: selectedProduct, // Use selected product ID
+      quantity: parseInt(stock.count, 10), // Ensure numeric values
+      stockPrice: parseFloat(stock.purchasingPrice), // Ensure numeric values
+    };
+    console.log('Payload:', payload);
+
+    axios
+      .put(`${API_BASE_URL}/${stock.stockId}`, payload)
+      .then(() => {
+        alert('Stock Added successfully!');
+      })
+      .catch((error) => {
+        console.error('Error updating stock:', error);
+        alert('Failed to update stock. Check the console for details.');
+      });
   };
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(+event.target.value);
-    setPage(0);
-  };
-
-// const columns = [
-//   { id: 'number', label: 'Number', minWidth: 50 },
-//   { id: 'stockId', label: 'Stock ID', minWidth: 150 },
-//   { id: 'productName', label: 'Product Name', minWidth: 150 },
-//   { id: 'count', label: 'Count', minWidth: 100 },
-//   { id: 'purchasingPrice', label: 'Purchasing Price', minWidth: 150 },
-//   { id: 'actions', label: 'Actions', minWidth: 100 },
-// ];
-
-// function AddStock() {
-//   const [rows, setRows] = React.useState([]);
-//   const [page, setPage] = React.useState(0);
-//   const [rowsPerPage, setRowsPerPage] = React.useState(10);
-//   const [confirmDelete, setConfirmDelete] = React.useState({ open: false, index: null });
-
-//   React.useEffect(() => {
-//     const fetchStocks = async () => {
-//       try {
-//         const response = await api.get('/stocks');
-//         setRows(response.data);
-//       } catch (error) {
-//         console.error('Error fetching stock data:', error);
-//       }
-//     };
-//     fetchStocks();
-//   }, []);
-
-//   const handleAddRow = async () => {
-//     try {
-//       const response = await api.post('/stocks', {
-//         number: rows.length + 1,
-//         stockId: 'Auto-generated',
-//         productName: '',
-//         count: '',
-//         purchasingPrice: '',
-//       });
-//       setRows((prevRows) => [...prevRows, response.data]);
-//     } catch (error) {
-//       console.error('Error adding new stock:', error);
-//       alert('Failed to add new stock.');
-//     }
-//   };
-
-//   const handleRowChange = async (index, field, value) => {
-//     const updatedRows = rows.map((row, i) =>
-//       i === index ? { ...row, [field]: value } : row
-//     );
-//     setRows(updatedRows);
-
-//     const stock = updatedRows[index];
-//     if (stock.stockId !== 'Auto-generated') {
-//       try {
-//         await api.put(`/stocks/${stock.stockId}`, stock);
-//       } catch (error) {
-//         console.error('Error updating stock:', error);
-//       }
-//     }
-//   };
-
-//   const handleDeleteRow = async () => {
-//     const stockId = rows[confirmDelete.index]?.stockId;
-//     try {
-//       if (stockId !== 'Auto-generated') {
-//         await api.delete(`/stocks/${stockId}`);
-//       }
-//       const updatedRows = rows
-//         .filter((_, i) => i !== confirmDelete.index)
-//         .map((row, i) => ({ ...row, number: i + 1 }));
-//       setRows(updatedRows);
-//       closeConfirmDelete();
-//     } catch (error) {
-//       console.error('Error deleting stock:', error);
-//       alert('Failed to delete stock.');
-//     }
-//   };
-
-//   const openConfirmDelete = (index) => {
-//     setConfirmDelete({ open: true, index });
-//   };
-
-//   const closeConfirmDelete = () => {
-//     setConfirmDelete({ open: false, index: null });
-//   };
-
-//   const handleSubmit = async () => {
-//     const invalidRows = rows.filter((row) => row.count === '' || row.count <= 0);
-//     if (invalidRows.length > 0) {
-//       alert('Please ensure all rows have a valid stock count before submitting.');
-//       return;
-//     }
-
-//     try {
-//       await api.post('/stocks', rows);
-//       alert('Stocks added successfully!');
-//       setRows([]);
-//     } catch (error) {
-//       console.error('Error submitting stock data:', error);
-//       alert('Failed to submit stock data.');
-//     }
-//   };
-
-//   const handleChangePage = (event, newPage) => {
-//     setPage(newPage);
-//   };
-
-//   const handleChangeRowsPerPage = (event) => {
-//     setRowsPerPage(+event.target.value);
-//     setPage(0);
-//   };
+  if (!stock) {
+    return <Typography>Loading stock details...</Typography>;
+  }
 
   return (
     <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-      {/* <div style={{  padding: '16px' }}> */}
-      <div >
       <Typography
         variant="h4"
         component="h1"
@@ -218,108 +125,60 @@ function AddStock() {
         Add Stock
       </Typography>
 
-      <TableContainer sx={{ maxHeight: 370 }}>
-        <Table stickyHeader aria-label="sticky table">
+      <TableContainer>
+        <Table stickyHeader aria-label="stock table">
           <TableHead>
             <TableRow>
-              {columns.map((column) => (
-                <TableCell key={column.id} style={{ minWidth: column.minWidth }}>
-                  {column.label}
-                </TableCell>
-              ))}
+              <TableCell>Stock ID</TableCell>
+              <TableCell>Product Name</TableCell>
+              <TableCell>Count</TableCell>
+              <TableCell>Purchasing Price</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row, index) => (
-              <TableRow key={index}>
-                <TableCell>{row.number}</TableCell>
-                <TableCell>{row.stockId}</TableCell>
-                <TableCell>
-                  <Select
-                    value={row.productName}
-                    onChange={(e) => handleRowChange(index, 'productName', e.target.value)}
-                    displayEmpty
-                    fullWidth
-                  >
-                    <MenuItem value="">
-                      <em>Select Product</em>
-                    </MenuItem>
-                    <MenuItem value="Product 1">Product 1</MenuItem>
-                    <MenuItem value="Product 2">Product 2</MenuItem>
-                    <MenuItem value="Product 3">Product 3</MenuItem>
-                  </Select>
-                </TableCell>
-                <TableCell>
-                  <TextField
-                    type="number"
-                    value={row.count}
-                    onChange={(e) => handleRowChange(index, 'count', e.target.value)}
-                    fullWidth
-                  />
-                </TableCell>
-                <TableCell>
-                  <TextField
-                    type="number"
-                    value={row.purchasingPrice}
-                    onChange={(e) => handleRowChange(index, 'purchasingPrice', e.target.value)}
-                    fullWidth
-                  />
-                </TableCell>
-                <TableCell>
-                
-                <Button
-                  variant="contained"
-                  sx={{ backgroundColor: '#d11a2a', color: 'white' }}
-                  onClick={() => openConfirmDelete(index)}
-                  startIcon={<DeleteIcon />}
+            <TableRow>
+              <TableCell>{stock.stockId}</TableCell>
+              <TableCell>
+                <Select
+                  value={selectedProduct}
+                  onChange={(e) => handleProductChange(e.target.value)}
+                  displayEmpty
+                  fullWidth
                 >
-                    Delete
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
+                  <MenuItem value="" disabled>
+                    Select a Product
+                  </MenuItem>
+                  {productOptions.map((product, idx) => (
+                    <MenuItem key={idx} value={product.productName}>
+                      {product.productName}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </TableCell>
+              <TableCell>
+                <TextField
+                  type="number"
+                  value={stock.count}
+                  onChange={(e) => handleFieldChange('count', e.target.value)}
+                  fullWidth
+                />
+              </TableCell>
+              <TableCell>
+                <TextField
+                  type="number"
+                  value={stock.purchasingPrice}
+                  onChange={(e) => handleFieldChange('purchasingPrice', e.target.value)}
+                  fullWidth
+                />
+              </TableCell>
+            </TableRow>
           </TableBody>
         </Table>
       </TableContainer>
-      <TablePagination
-        rowsPerPageOptions={[10, 25, 100]}
-        component="div"
-        count={rows.length}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={handleChangePage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-      />
-      <div style={{ display: 'flex', justifyContent: 'space-between', padding: '16px' }}>
-        <Button variant="contained" onClick={handleAddRow}>
-          Add Stock Item
-        </Button>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '16px' }}>
         <Button variant="contained" color="primary" onClick={handleSubmit}>
           Submit
         </Button>
-      </div>
-
-      <Dialog
-        open={confirmDelete.open}
-        onClose={closeConfirmDelete}
-        aria-labelledby="confirm-delete-title"
-        aria-describedby="confirm-delete-description"
-      >
-        <DialogTitle id="confirm-delete-title">Confirm Delete</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="confirm-delete-description">
-            Are you sure you want to delete this stock ?
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={closeConfirmDelete} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={handleDeleteRow} color="secondary" autoFocus>
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
       </div>
     </Paper>
   );
