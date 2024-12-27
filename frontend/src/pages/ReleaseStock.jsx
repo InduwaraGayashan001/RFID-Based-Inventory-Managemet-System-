@@ -18,7 +18,6 @@ const API_LAST_ITEM_URL = 'http://localhost:8080/api/stocks/last';
 
 function ReleaseStock() {
   const [stock, setStock] = React.useState(null);
-  const [productOptions, setProductOptions] = React.useState([]);
   const [selectedProduct, setSelectedProduct] = React.useState('');
 
 
