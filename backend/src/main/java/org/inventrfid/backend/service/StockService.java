@@ -30,6 +30,10 @@ public class StockService {
         return stockRepository.save(stock);
     }
 
+    public boolean doesStockExist(String rfid) {
+        return stockRepository.findByRfid(rfid) != null;
+    }
+
     // Method to get a stock by RFID
     public Optional<Stock> getStockByRfid(String rfid) {
         return Optional.ofNullable(stockRepository.findByRfid(rfid));
