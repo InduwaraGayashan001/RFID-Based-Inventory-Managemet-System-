@@ -26,6 +26,7 @@ public class StockService {
     public Stock createStockFromMqtt(String rfid) {
         Stock stock = new Stock();
         stock.setRfid(rfid);// Default stock price as 0
+        stock.setTimestamp(new Date());
         return stockRepository.save(stock);
     }
 
@@ -44,7 +45,7 @@ public class StockService {
             stock.setQuantity(quantity);
             stock.setProduct(product);
             stock.setStockPrice(stockPrice);
-            stock.setTimestamp(new Date());  // Update timestamp when stock is updated
+            //stock.setTimestamp(new Date());  // Update timestamp when stock is updated
             return stockRepository.save(stock);
         } else {
             throw new RuntimeException("Stock not found with RFID: " + rfid);
@@ -96,6 +97,15 @@ public class StockService {
         stock.setStockPrice(stockDTO.getStockPrice());
         return stock;
     }
+
+    // Method to get the last stock item
+    public Stock getLastStock() {
+        return stockRepository.findTopByOrderByTimestampDesc();
+    }
+//    public Stock getLastStock() {
+//        return stockRepository.findLastStock();
+//    }
+
 }
 
 
