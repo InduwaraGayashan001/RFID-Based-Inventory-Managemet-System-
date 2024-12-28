@@ -38,13 +38,35 @@ public class ReleaseService {
     }
 
     public Release updateRelease(Long transactionId, int releaseQuantity, BigDecimal releasePrice) {
+        // Fetch the release by transaction ID
         Release release = releaseRepository.findById(transactionId)
                 .orElseThrow(() -> new RuntimeException("Release not found with Transaction ID: " + transactionId));
+
+        // Fetch the associated stock by stock ID from the release
+        Stock stock = stockRepository.findById(release.getStock().getRfid())
+                .orElseThrow(() -> new RuntimeException("Stock not found with Stock ID: " + release.getStock().getRfid()));
+
+        // Check if the new release quantity exceeds the available stock
+        int stockAvailable = stock.getQuantity();
+        int currentReleaseQuantity = release.getReleaseQuantity();
+
+        // Calculate the net change in release quantity
+        int quantityDifference = releaseQuantity - currentReleaseQuantity;
+
+        if (quantityDifference > stockAvailable) {
+            throw new RuntimeException("Insufficient stock to update the release. Available stock: " + stockAvailable);
+        }
+
+        // Update the stock quantity
+        stock.setQuantity(stockAvailable - quantityDifference);
+        stockRepository.save(stock);
+
+        // Update the release details
         release.setReleaseQuantity(releaseQuantity);
         release.setReleasePrice(releasePrice);
-        //release.setTimestamp(new Date());
         return releaseRepository.save(release);
     }
+
 
     public List<ReleaseDTO> getAll() {
         List<Release> releases = releaseRepository.findAll();
