@@ -1,7 +1,9 @@
 package org.inventrfid.backend.controller;
 
 import org.inventrfid.backend.dto.ReleaseDTO;
+import org.inventrfid.backend.dto.StockDTO;
 import org.inventrfid.backend.entity.Release;
+import org.inventrfid.backend.entity.Stock;
 import org.inventrfid.backend.service.ReleaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +32,13 @@ public class ReleaseController {
         return releaseService.mapToDto(release);
     }
 
+    // Get the last stock item
+    @GetMapping("/last")
+    public ReleaseDTO getLastRelease() {
+        Release release = releaseService.getLastRelease();
+        return releaseService.mapToDto(release);
+    }
+
     @PutMapping("/{transactionId}")
     public ReleaseDTO updateRelease(
             @PathVariable Long transactionId,
@@ -44,11 +53,7 @@ public class ReleaseController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping
-    public ResponseEntity<ReleaseDTO> createRelease(@RequestBody ReleaseDTO releaseDto) {
-        ReleaseDTO createdRelease = releaseService.createRelease(releaseDto);
-        return ResponseEntity.ok(createdRelease);
-    }
+
 
 }
 
