@@ -31,8 +31,13 @@ function ReleaseStock() {
           releaseQuantity: product.releaseQuantity,
           releasePrice : product.releasePrice,
           time: formatTimestamp(product.timestamp),
-          
         });
+        console.log('Current scanned RFID related stock:', product.releaseQuantity);
+        if (stock.releaseQuantity !== 0) {
+          alert('Current scanned RFID related stock already released. Redirecting to Release Stock Page. Scan new RFID and try again.');
+          window.location.href = '/view-release'; // Redirect to /view-stock
+          return;
+        };
         console.log('Getting Payload:', product);
       })
       .catch((error) => {

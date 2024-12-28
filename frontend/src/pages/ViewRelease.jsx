@@ -22,6 +22,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import SaveIcon from '@mui/icons-material/Save';
 import axios from 'axios';
 
+
 const columns = [
     { id: 'number', label: 'No', minWidth: 50 },
     { id: 'time', label: 'Time', minWidth: 150 },
@@ -41,6 +42,7 @@ function ViewRelease() {
     const [editIndex, setEditIndex] = React.useState(null);
     const [confirmDelete, setConfirmDelete] = React.useState({ open: false, index: null });
     const [zeroProductDialogOpen, setZeroProductDialogOpen] = React.useState(false);
+ 
 
 
     React.useEffect(() => {
@@ -77,7 +79,8 @@ function ViewRelease() {
     };
 
     const handleDeleteRow = () => {
-        const productId = rows[confirmDelete.index].stockId;
+        const productId = rows[confirmDelete.index].transactionId;
+        console.log('Deleting product with ID:', productId);
         axios.delete(`${API_BASE_URL}/${productId}`)
             .then(() => {
                 const updatedRows = rows
@@ -126,21 +129,22 @@ function ViewRelease() {
         setConfirmDelete({ open: false, index: null });
     };
 
-    const fetchProducts = async (rfid) => {
+    const fetchProducts = async (transactionId) => {
         try {
-            const response = await axios.get(`${API_BASE_URL}/${rows.transactionId}`); // Fetch only the data for the given rfid
+            console.log('Fetching product with ID:', transactionId);
+            const response = await axios.get(`${API_BASE_URL}/${transactionId}`); // Fetch only the data for the given rfid1
             const updatedProduct = {
-                number: rows.findIndex((row) => row.stockId === rfid) + 1, // Serial number (existing index + 1)
+                number: rows.findIndex((row) => row.stockId === transactionId) + 1, // Serial number (existing index + 1)
                 stockId: response.data.rfid, // Mapped from productId
                 transactionId: response.data.transactionId, // Mapped from productId
 
-                releaseQuantity: response.datat.releaseQuantity, // Mapped from quantity
+                releaseQuantity: response.data.releaseQuantity, // Mapped from quantity
                 releasePrice: response.data.releasePrice, // Mapped from stockPrice
                 time: response.data.timestamp,
             };
             setRows((prevRows) =>
                 prevRows.map((row) =>
-                    row.stockId === rfid ? updatedProduct : row // Replace only the matching row
+                    row.stockId === transactionId ? updatedProduct : row // Replace only the matching row
                 )
             );
         } catch (error) {
@@ -154,15 +158,23 @@ function ViewRelease() {
         console.log('Updated Product ID:', updatedProduct.transactionId);
         axios.put(`${API_BASE_URL}/${updatedProduct.transactionId}`, updatedProduct)
             .then(() => {
-                console.log('Product updated successfully:', updatedProduct);
+                //console.log('Product updated successfully:', updatedProduct);
+                
                 alert('Product updated successfully!');
-                fetchProducts(updatedProduct.stockId);
+                //setDialogOpen(true);
+                //setDialogOpen(false);
+                console.log('Product updated successfully:', updatedProduct);
+                console.log('Product updated successfully:', updatedProduct.transactionId);
+                fetchProducts(updatedProduct.transactionId);
                 setEditIndex(null); // Exit edit mode
+                
 
             })
             .catch(error => {
                 console.error('There was an error updating the product!', error);
             });
+        
+            
 
     };
 
@@ -202,8 +214,9 @@ function ViewRelease() {
                                 <TableRow key={index}>
                                     <TableCell>{row.number}</TableCell>
                                     <TableCell>{formatTimestamp(row.time)}</TableCell>
-                                    <TableCell>{row.stockId}</TableCell>
                                     <TableCell>{row.transactionId}</TableCell>
+                                    <TableCell>{row.stockId}</TableCell>
+                                    
 
                                     <TableCell>
                                         {editIndex === index ? (
