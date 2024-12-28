@@ -72,6 +72,7 @@ public class StockService {
     // Method to get all stocks
     public List<StockDTO> getAllStocks() {
         return stockRepository.findAll().stream()
+                .filter(stock -> stock.getProduct() != null)
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
     }
