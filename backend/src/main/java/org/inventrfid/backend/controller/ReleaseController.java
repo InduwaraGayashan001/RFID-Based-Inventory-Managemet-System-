@@ -30,6 +30,12 @@ public class ReleaseController {
         return releaseService.mapToDto(release);
     }
 
+    @GetMapping("/last")
+    public ReleaseDTO getLastRelease() {
+        Release release = releaseService.getLastRelease();
+        return releaseService.mapToDto(release);
+    }
+
     @PutMapping("/{transactionId}")
     public ReleaseDTO updateRelease(
             @PathVariable Long transactionId,
@@ -44,11 +50,7 @@ public class ReleaseController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping
-    public ResponseEntity<ReleaseDTO> createRelease(@RequestBody ReleaseDTO releaseDto) {
-        ReleaseDTO createdRelease = releaseService.createRelease(releaseDto);
-        return ResponseEntity.ok(createdRelease);
-    }
+
 
 }
 
