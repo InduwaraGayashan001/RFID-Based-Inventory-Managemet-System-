@@ -14,47 +14,29 @@ import Typography from '@mui/material/Typography';
 import axios from 'axios';
 
 const API_RRELEASE_URL = 'http://localhost:8080/api/releases';
-const API_LAST_ITEM_URL = 'http://localhost:8080/api/stocks/last';
+const API_LAST_ITEM_URL = 'http://localhost:8080/api/releases/last';
 
 function ReleaseStock() {
   const [stock, setStock] = React.useState(null);
-  const [selectedProduct, setSelectedProduct] = React.useState('');
-
-
+  //const [selectedStockId, setSelectedStockId] = React.useState('');
   React.useEffect(() => {
-    // Fetch the latest stock item
     axios
       .get(API_LAST_ITEM_URL)
       .then((response) => {
         const product = response.data;
         setStock({
-          stockId: product.rfid,
-          productId: product.productId,
-          count: product.quantity,
-          purchasingPrice: product.stockPrice,
+          transactionId: product.transactionId,
+          rfId: product.rfid,
+          releaseQuantity: product.releaseQuantity,
+          releasePrice : product.releasePrice,
+          time: product.timestamp,
           
         });
-      
-        setSelectedProduct(product.productId); // Set the default selected product
-        console.log('Selected product:', selectedProduct);
-        
+        console.log('Getting Payload:', product);
       })
       .catch((error) => {
         console.error('Error fetching the latest stock:', error);
       });
-
-    // Fetch product options for dropdown
-     // Fetch product options for dropdown
-     axios
-     .get('http://localhost:8080/api/products')
-     .then((response) => {
-       setProductOptions(response.data);
-       console.log('Product options:', response.data);
-       
-     })
-     .catch((error) => {
-       console.error('Error fetching product options:', error);
-     });
     }, []);
 
   const handleFieldChange = (field, value) => {
@@ -67,28 +49,27 @@ function ReleaseStock() {
   
 
   const handleSubmit = () => {
-    
-    if (stock.count <= 0 || stock.purchasingPrice <= 0) {
+      if (stock.releaseQuantity <= 0 || stock.releasePrice <= 0) {
       alert('Please provide valid count and purchasing price.');
       return;
     }
 
     const payload = {
-      rfid: stock.stockId,
-      productId: selectedProduct, // Use selected product ID
-      quantity: parseInt(stock.count, 10), // Ensure numeric values
-      stockPrice: parseFloat(stock.purchasingPrice), // Ensure numeric values
+      transactionId: stock.transactionId,
+      rfId: stock.rfId,
+      releaseQuantity: stock.releaseQuantity,
+      releasePrice : stock.releasePrice,
     };
-    console.log('Payload:', payload);
+    console.log('Putting Payload:', payload);
 
     axios
-      .put(`${API_BASE_URL}/${stock.stockId}`, payload)
+      .put(`${API_RRELEASE_URL}/${stock.transactionId}`, payload)
       .then(() => {
-        alert('Stock Added successfully!');
+        alert('Stock Released successfully!');
       })
       .catch((error) => {
-        console.error('Error updating stock:', error);
-        alert('Failed to update stock. Check the console for details.');
+        console.error('Error releasinging stock:', error);
+        alert('Failed to release stock. Check the console for details.');
       });
   };
 
@@ -116,29 +97,31 @@ function ReleaseStock() {
         <Table stickyHeader aria-label="stock table">
           <TableHead>
             <TableRow>
+            <TableCell>Transaction ID</TableCell>
               <TableCell>Stock ID</TableCell>
-              <TableCell>Product ID</TableCell>
+              <TableCell>Time</TableCell>
               <TableCell>Count</TableCell>
-              <TableCell>Purchasing Price</TableCell>
+              <TableCell>Releasing Price</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             <TableRow>
-              <TableCell>{stock.stockId}</TableCell>
-              <TableCell>{stock.productId}</TableCell>
+              <TableCell>{stock.transactionId}</TableCell>
+              <TableCell>{stock.rfId}</TableCell>
+              <TableCell>{stock.time}</TableCell>
               <TableCell>
                 <TextField
                   type="number"
-                  value= {stock.count}
-                  onChange={(e) => handleFieldChange('count', e.target.value)}
+                  value= {stock.releaseQuantity}
+                  onChange={(e) => handleFieldChange('releaseQuantity', e.target.value)}
                   fullWidth
                 />
               </TableCell>
               <TableCell>
                 <TextField
                   type="number"
-                  value={stock.purchasingPrice}
-                  onChange={(e) => handleFieldChange('purchasingPrice', e.target.value)}
+                  value={stock.releasePrice}
+                  onChange={(e) => handleFieldChange('releasePrice', e.target.value)}
                   fullWidth
                 />
               </TableCell>
