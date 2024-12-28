@@ -12,6 +12,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const API_RRELEASE_URL = 'http://localhost:8080/api/releases';
 const API_LAST_ITEM_URL = 'http://localhost:8080/api/releases/last';
@@ -29,7 +30,7 @@ function ReleaseStock() {
           rfId: product.rfid,
           releaseQuantity: product.releaseQuantity,
           releasePrice : product.releasePrice,
-          time: product.timestamp,
+          time: formatTimestamp(product.timestamp),
           
         });
         console.log('Getting Payload:', product);
@@ -46,6 +47,12 @@ function ReleaseStock() {
     }));
   };
 
+  const formatTimestamp = (timestamp) => {
+    const date = new Date(timestamp);
+    const formattedDate = date.toISOString().split("T")[0]; // Get YYYY-MM-DD
+    const formattedTime = date.toTimeString().split(" ")[0]; // Get HH:MM:SS
+    return `${formattedDate} ${formattedTime}`;
+  };
   
 
   const handleSubmit = () => {
@@ -65,7 +72,8 @@ function ReleaseStock() {
     axios
       .put(`${API_RRELEASE_URL}/${stock.transactionId}`, payload)
       .then(() => {
-        alert('Stock Released successfully!');
+        alert('Stock Released successfully! Press OK to view the Relaease stock');
+        window.location.href = '/view-release'; 
       })
       .catch((error) => {
         console.error('Error releasinging stock:', error);

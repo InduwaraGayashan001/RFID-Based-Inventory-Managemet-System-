@@ -9,6 +9,7 @@ import ReleaseStock from './pages/ReleaseStock';
 import ViewEditStock from './pages/ViewEditStock';
 import Footer from './components/Footer';
 import Home from './pages/Home';
+import ViewRelease from './pages/ViewRelease';
 import './index.css';
 
 
@@ -27,6 +28,7 @@ const App = () => {
                 <Route path="/add-stock" element={<AddStock />} />
                 <Route path="/release-stock" element={<ReleaseStock />} />
                 <Route path="/edit" element={<ViewEditStock />} />
+                <Route path="/view-release" element={<ViewRelease />} />
             </Routes>
           </div>
           <div id='footercontent'>

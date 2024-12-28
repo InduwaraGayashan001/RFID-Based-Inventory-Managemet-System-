@@ -22,7 +22,8 @@ const navItems = [
   { name: 'Product', path: '/view-product' },
   { name: 'Add Stock', path: '/add-stock' },
   { name: 'View Stock', path: '/view-stock' },
-  { name: 'Release Stock', path: '/release-stock' }
+  { name: 'Release Stock', path: '/release-stock' },
+  { name: 'View Release', path: '/view-release' }
 ];
 
 function Header(props) {
