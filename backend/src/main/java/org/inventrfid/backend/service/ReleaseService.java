@@ -33,6 +33,7 @@ public class ReleaseService {
         Stock stock = stockRepository.findByRfid(rfid);
         Release release = new Release();
         release.setStock(stock);
+        release.setTimestamp(new Date());
         return releaseRepository.save(release);
     }
 
@@ -41,13 +42,14 @@ public class ReleaseService {
                 .orElseThrow(() -> new RuntimeException("Release not found with Transaction ID: " + transactionId));
         release.setReleaseQuantity(releaseQuantity);
         release.setReleasePrice(releasePrice);
-        release.setTimestamp(new Date());
+        //release.setTimestamp(new Date());
         return releaseRepository.save(release);
     }
 
     public List<ReleaseDTO> getAll() {
         List<Release> releases = releaseRepository.findAll();
         return releases.stream()
+                .filter(release -> release.getReleaseQuantity() > 0)
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
     }
@@ -60,6 +62,10 @@ public class ReleaseService {
         Release release = releaseRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Release not found with ID: " + id));
         releaseRepository.delete(release);
+    }
+
+    public Release getLastRelease() {
+        return releaseRepository.findTopByOrderByTimestampDesc();
     }
 
     public ReleaseDTO mapToDto(Release release) {
