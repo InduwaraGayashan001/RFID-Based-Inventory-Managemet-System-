@@ -366,3 +366,168 @@ function ViewRelease() {
 }
 
 export default ViewRelease;
+
+// import React, { useEffect, useState } from 'react';
+// import { useDispatch, useSelector } from 'react-redux';
+// import {
+//     fetchReleases,
+//     updateRelease,
+//     deleteRelease,
+// } from '../State/actions/ViewReleaseActions';
+// import {
+//     Paper,
+//     Table,
+//     TableBody,
+//     TableCell,
+//     TableContainer,
+//     TableHead,
+//     TablePagination,
+//     TableRow,
+//     TextField,
+//     Button,
+//     Dialog,
+//     DialogActions,
+//     DialogContent,
+//     DialogContentText,
+//     DialogTitle,
+//     Typography,
+// } from '@mui/material';
+// import { Edit as EditIcon, Delete as DeleteIcon, Save as SaveIcon } from '@mui/icons-material';
+
+// const columns = [
+//     { id: 'number', label: 'No', minWidth: 50 },
+//     { id: 'time', label: 'Time', minWidth: 150 },
+//     { id: 'transactionId', label: 'Transaction ID', minWidth: 150 },
+//     { id: 'stockID', label: 'Stock ID', minWidth: 150 },
+//     { id: 'releaseQuantity', label: 'Release Quantity', minWidth: 100 },
+//     { id: 'releasePrice', label: 'Release Price', minWidth: 150 },
+//     { id: 'actions', label: 'Actions', minWidth: 200 },
+// ];
+
+// function ViewRelease() {
+//     const dispatch = useDispatch();
+//     const { releases } = useSelector((state) => state.release);
+
+//     const [editIndex, setEditIndex] = useState(null);
+//     const [page, setPage] = useState(0);
+//     const [rowsPerPage, setRowsPerPage] = useState(10);
+
+//     useEffect(() => {
+//         dispatch(fetchReleases());
+//     }, [dispatch]);
+
+//     const handleRowChange = (index, field, value) => {
+//         const updatedRow = { ...releases[index], [field]: value };
+//         dispatch(updateRelease(updatedRow.transactionId, updatedRow));
+//     };
+
+//     const handleDeleteRow = (transactionId) => {
+//         dispatch(deleteRelease(transactionId));
+//     };
+
+//     const handleEdit = (index) => setEditIndex(index);
+//     const handleCancelEdit = () => setEditIndex(null);
+
+//     const handleChangePage = (event, newPage) => setPage(newPage);
+//     const handleChangeRowsPerPage = (event) => {
+//         setRowsPerPage(+event.target.value);
+//         setPage(0);
+//     };
+
+//     return (
+//         <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+//             <Typography variant="h4" align="center" gutterBottom>
+//                 View Release Stock
+//             </Typography>
+//             <TableContainer sx={{ maxHeight: 440 }}>
+//                 <Table stickyHeader>
+//                     <TableHead>
+//                         <TableRow>
+//                             {columns.map((column) => (
+//                                 <TableCell key={column.id}>{column.label}</TableCell>
+//                             ))}
+//                         </TableRow>
+//                     </TableHead>
+//                     <TableBody>
+//                         {releases
+//                             .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+//                             .map((row, index) => (
+//                                 <TableRow key={row.transactionId}>
+//                                     <TableCell>{row.number}</TableCell>
+//                                     <TableCell>{row.time}</TableCell>
+//                                     <TableCell>{row.transactionId}</TableCell>
+//                                     <TableCell>{row.stockId}</TableCell>
+//                                     <TableCell>
+//                                         {editIndex === index ? (
+//                                             <TextField
+//                                                 type="number"
+//                                                 value={row.releaseQuantity}
+//                                                 onChange={(e) =>
+//                                                     handleRowChange(index, 'releaseQuantity', e.target.value)
+//                                                 }
+//                                             />
+//                                         ) : (
+//                                             row.releaseQuantity
+//                                         )}
+//                                     </TableCell>
+//                                     <TableCell>
+//                                         {editIndex === index ? (
+//                                             <TextField
+//                                                 type="number"
+//                                                 value={row.releasePrice}
+//                                                 onChange={(e) =>
+//                                                     handleRowChange(index, 'releasePrice', e.target.value)
+//                                                 }
+//                                             />
+//                                         ) : (
+//                                             row.releasePrice
+//                                         )}
+//                                     </TableCell>
+//                                     <TableCell>
+//                                         {editIndex === index ? (
+//                                             <>
+//                                                 <Button
+//                                                     startIcon={<SaveIcon />}
+//                                                     onClick={() => setEditIndex(null)}
+//                                                 >
+//                                                     Save
+//                                                 </Button>
+//                                                 <Button onClick={handleCancelEdit}>Cancel</Button>
+//                                             </>
+//                                         ) : (
+//                                             <>
+//                                                 <Button
+//                                                     startIcon={<EditIcon />}
+//                                                     onClick={() => handleEdit(index)}
+//                                                 >
+//                                                     Edit
+//                                                 </Button>
+//                                                 <Button
+//                                                     startIcon={<DeleteIcon />}
+//                                                     onClick={() => handleDeleteRow(row.transactionId)}
+//                                                 >
+//                                                     Delete
+//                                                 </Button>
+//                                             </>
+//                                         )}
+//                                     </TableCell>
+//                                 </TableRow>
+//                             ))}
+//                     </TableBody>
+//                 </Table>
+//             </TableContainer>
+//             <TablePagination
+//                 rowsPerPageOptions={[10, 25, 100]}
+//                 component="div"
+//                 count={releases.length}
+//                 rowsPerPage={rowsPerPage}
+//                 page={page}
+//                 onPageChange={handleChangePage}
+//                 onRowsPerPageChange={handleChangeRowsPerPage}
+//             />
+//         </Paper>
+//     );
+// }
+
+// export default ViewRelease;
+
