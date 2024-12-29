@@ -81,10 +81,22 @@ public class ReleaseService {
     }
 
     public void deleteRelease(Long id) {
+        // Fetch the release by ID
         Release release = releaseRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Release not found with ID: " + id));
+
+        // Fetch the associated stock by stock ID from the release
+        Stock stock = stockRepository.findById(release.getStock().getRfid())
+                .orElseThrow(() -> new RuntimeException("Stock not found with Stock ID: " + release.getStock().getRfid()));
+
+        // Restore the release quantity back to the stock
+        stock.setQuantity(stock.getQuantity() + release.getReleaseQuantity());
+        stockRepository.save(stock);
+
+        // Delete the release
         releaseRepository.delete(release);
     }
+
 
     public Release getLastRelease() {
         return releaseRepository.findTopByOrderByTimestampDesc();
