@@ -25,7 +25,7 @@ import axios from 'axios';
 const columns = [
   { id: 'number', label: 'Number', minWidth: 50 },
   { id: 'stockId', label: 'Stock ID', minWidth: 150 },
-  { id: 'productName', label: 'Product', minWidth: 150 },
+  { id: 'productName', label: 'Product Name', minWidth: 150 },
   { id: 'count', label: 'Count', minWidth: 100 },
   { id: 'purchasingPrice', label: 'Purchasing Price', minWidth: 150 },
   { id: 'actions', label: 'Actions', minWidth: 200 },
@@ -42,7 +42,7 @@ function ViewStock() {
   const [productOptions, setProductOptions] = React.useState([]);
   const [selectedProduct, setSelectedProduct] = React.useState('');
   const [zeroProductDialogOpen, setZeroProductDialogOpen] = React.useState(false);
-
+  const [selectedProductName, setSelectedProductName] = React.useState('');
 
   React.useEffect(() => {
     axios.get(API_BASE_URL)
@@ -164,7 +164,7 @@ const closeZeroProductDialog = () => {
       if (selected) {
         console.log("Selected Product:", selected.productName);
         console.log("Selected Product ID:", selected.Pid);
-        
+        setSelectedProductName(selected.productName);
         setSelectedProduct(selected.Pid); // Assuming Pid is the value you want to store
         console.log("Selected Product PID:", selectedProduct);
         console.log("Selected Product is:",selectedProduct);
@@ -229,6 +229,7 @@ const closeZeroProductDialog = () => {
   const handleSave = () => {
     const updatedProduct = rows[editIndex];
     console.log(selectedProduct); // Debugging
+    
     console.log('save'); // Debugging
     console.log(updatedProduct); // Debugging
     // Prepare the correct payload based on the original mapping
@@ -246,7 +247,7 @@ const closeZeroProductDialog = () => {
         console.log('Product updated successfully:', payload);
         fetchProducts(updatedProduct.stockId);
         setEditIndex(null); // Exit edit mode
-        
+        setSelectedProductName('');
       })
       .catch(error => {
         console.error('There was an error updating the product!', error);
@@ -345,7 +346,8 @@ const closeZeroProductDialog = () => {
         <TableCell>
           {editIndex === index ? (
             <Select 
-            value={selectedProduct}
+            value={selectedProductName}
+            
             placeholder="Product"
             onChange={(e) => myProduct(e.target.value)}
             displayEmpty
@@ -356,6 +358,7 @@ const closeZeroProductDialog = () => {
             </MenuItem>
 
             {productOptions.map((product, idx) => (
+
               <MenuItem key={idx} value={product.productName}>
                  {product.productName} 
               </MenuItem>
@@ -363,7 +366,7 @@ const closeZeroProductDialog = () => {
             ))}
           </Select>
           ) : (
-            row.productName
+            productOptions.find((product) => product.Pid === row.productName)?.productName || row.productName
           )}
         </TableCell>
         {/* <TableCell>
