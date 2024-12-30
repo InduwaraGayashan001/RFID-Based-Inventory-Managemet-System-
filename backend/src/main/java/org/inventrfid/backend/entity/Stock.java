@@ -2,11 +2,13 @@ package org.inventrfid.backend.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Date;
 
+@Setter
 @Getter
 @Entity
 public class Stock {
@@ -27,23 +29,5 @@ public class Stock {
     @Column(name = "stockPrice", nullable = true)
     private java.math.BigDecimal stockPrice;
 
-    public void setRfid(String rfid) {
-        this.rfid = rfid;
-    }
 
-    public void setProduct(Product product) {
-        this.product = product;
-    }
-
-    public void setTimestamp(Date timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    public void setQuantity(int quantity) {
-        Quantity = quantity;
-    }
-
-    public void setStockPrice(BigDecimal stockPrice) {
-        this.stockPrice = stockPrice;
-    }
 }
