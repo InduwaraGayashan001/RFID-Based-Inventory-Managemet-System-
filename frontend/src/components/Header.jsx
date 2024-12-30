@@ -19,6 +19,7 @@ import Clogo from '../assets/clogo.png';
 
 const headerWidth = 240;
 const navItems = [
+  { name: 'Dashboard', path: '/dashboard' },
   { name: 'Product', path: '/view-product' },
   { name: 'Add Stock', path: '/add-stock' },
   { name: 'View Stock', path: '/view-stock' },

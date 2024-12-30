@@ -10,6 +10,7 @@ import ViewEditStock from './pages/ViewEditStock';
 import Footer from './components/Footer';
 import Home from './pages/Home';
 import ViewRelease from './pages/ViewRelease';
+import DashboardSummary from "./pages/DashboardSummary";
 import './index.css';
 
 
@@ -22,6 +23,7 @@ const App = () => {
           <div id = 'bodycontent'>
             <Routes>
                 <Route path="/" element={<Home />} />
+                <Route path="/dashboard" element={<DashboardSummary />} /> 
                 <Route path="/add-product" element={<AddProduct />} />
                 <Route path="/view-product" element={<ViewProduct />} />
                 <Route path="/view-stock" element={<ViewStock />} />
