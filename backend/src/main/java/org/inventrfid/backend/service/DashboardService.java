@@ -31,24 +31,35 @@ public class DashboardService {
         // Calculate total products
         long totalProducts = productRepository.count();
 
-        // Calculate total stock quantity and purchase price
+        // Calculate total stock quantity and purchase price (only stocks with quantity > 0)
         List<Stock> stocks = stockRepository.findAll();
-        int totalStockQuantity = stocks.stream().mapToInt(Stock::getQuantity).sum();
+        int totalStockQuantity = stocks.stream()
+                .filter(stock -> stock.getQuantity() > 0) // Filter stocks with quantity > 0
+                .mapToInt(Stock::getQuantity)
+                .sum();
         BigDecimal totalPurchasePrice = stocks.stream()
+                .filter(stock -> stock.getQuantity() > 0) // Filter stocks with quantity > 0
                 .map(stock -> stock.getStockPrice().multiply(BigDecimal.valueOf(stock.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        // Calculate total release units and total revenue
+        // Calculate total release units and total revenue (only releases with quantity > 0)
         List<Release> releases = releaseRepository.findAll();
-        int totalReleaseUnits = releases.stream().mapToInt(Release::getReleaseQuantity).sum();
+        int totalReleaseUnits = releases.stream()
+                .filter(release -> release.getReleaseQuantity() > 0) // Filter releases with quantity > 0
+                .mapToInt(Release::getReleaseQuantity)
+                .sum();
         BigDecimal totalRevenue = releases.stream()
+                .filter(release -> release.getReleaseQuantity() > 0) // Filter releases with quantity > 0
                 .map(release -> release.getReleasePrice().multiply(BigDecimal.valueOf(release.getReleaseQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        // Calculate total profit
+
+        // Calculate total profit (only for stocks with quantity > 0)
         BigDecimal totalProfit = stocks.stream()
+                .filter(stock -> stock.getQuantity() > 0) // Filter stocks with quantity > 0
                 .map(Stock::getProfit)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+
 
         // Create the summary DTO
         return new DashboardSummaryDTO(
