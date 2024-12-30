@@ -20,6 +20,7 @@ function AddStock() {
   const [stock, setStock] = React.useState(null);
   const [productOptions, setProductOptions] = React.useState([]);
   const [selectedProduct, setSelectedProduct] = React.useState('');
+  const [selectedProductName, setSelectedProductName] = React.useState('');
 
   React.useEffect(() => {
     // Fetch the latest stock item
@@ -41,6 +42,7 @@ function AddStock() {
         };
         
         setSelectedProduct(product.productId); // Set the default selected product
+        
       })
       .catch((error) => {
         console.error('Error fetching the latest stock:', error);
@@ -71,7 +73,8 @@ function AddStock() {
     console.log('Product:', product);
     console.log('Product ID:', product.pid);
     setSelectedProduct(product.pid);
-    alert(` ${product.productName} selected Click on Submit to add the stock`);
+    setSelectedProductName(product.productName);
+    //alert(` ${product.productName} selected Click on Submit to add the stock`);
 
   };
 
@@ -98,6 +101,8 @@ function AddStock() {
       .put(`${API_BASE_URL}/${stock.stockId}`, payload)
       .then(() => {
         alert('Stock Added successfully!');
+        window.location.href = '/view-stock'; // Redirect to /view-stock
+        setSelectedProductName('Select ');
       })
       .catch((error) => {
         console.error('Error updating stock:', error);
@@ -139,8 +144,9 @@ function AddStock() {
             <TableRow>
               <TableCell>{stock.stockId}</TableCell>
               <TableCell>
-                <Select
-                  value={selectedProduct}
+                 <Select
+                  value={selectedProductName}
+                  placeholder="Product"
                   onChange={(e) => handleProductChange(e.target.value)}
                   displayEmpty
                   fullWidth
@@ -153,7 +159,10 @@ function AddStock() {
                       {product.productName}
                     </MenuItem>
                   ))}
-                </Select>
+                </Select> 
+             
+        
+            
               </TableCell>
               <TableCell>
                 <TextField
