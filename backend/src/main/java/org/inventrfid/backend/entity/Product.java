@@ -18,5 +18,7 @@ public class Product {
     @Column(name = "productName", nullable = false)
     private String productName;
 
+    @Column(name = "Profit", nullable = true)
+    private java.math.BigDecimal profit;
 
 }
