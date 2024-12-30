@@ -27,7 +27,7 @@ const columns = [
   { id: 'stockId', label: 'Stock ID', minWidth: 150 },
   { id: 'productName', label: 'Product', minWidth: 150 },
   { id: 'count', label: 'Count', minWidth: 100 },
-  { id: 'purchasingPrice', label: 'Purchasing Price', minWidth: 150 },
+  { id: 'purchasingPrice', label: 'Purchasing Price(per unit)', minWidth: 150 },
   { id: 'actions', label: 'Actions', minWidth: 200 },
 ];
 

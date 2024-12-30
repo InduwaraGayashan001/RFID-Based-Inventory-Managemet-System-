@@ -29,7 +29,7 @@ const columns = [
     { id: 'transactionId', label: 'Transaction ID', minWidth: 150 },
     { id: 'stockID', label: 'Stock ID', minWidth: 150 },
     { id: 'releaseQuantity', label: 'Release Quantity', minWidth: 100 },
-    { id: 'releasePrice', label: 'Release Price', minWidth: 150 },
+    { id: 'releasePrice', label: 'Releasing Price(per unit)', minWidth: 150 },
     { id: 'actions', label: 'Actions', minWidth: 200 },
 ];
 
