@@ -15,6 +15,7 @@ public class StockDTO {
     private Date timestamp;
     private int quantity;
     private BigDecimal stockPrice;
+    private BigDecimal profit;
 
 }
 
