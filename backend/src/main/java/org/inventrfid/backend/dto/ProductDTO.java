@@ -12,5 +12,6 @@ public class ProductDTO {
 
     private int pid;
     private String productName;
+    private BigDecimal profit;
 
 }
