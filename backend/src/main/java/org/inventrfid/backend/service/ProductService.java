@@ -7,6 +7,7 @@ import org.inventrfid.backend.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,6 +34,7 @@ public class ProductService {
     // Create a new product
     public ProductDTO createProduct(ProductDTO productDTO) {
         Product product = mapToEntity(productDTO);
+        product.setProfit(BigDecimal.valueOf(0));
         product = productRepository.save(product);
         return mapToDTO(product);
     }
@@ -59,6 +61,7 @@ public class ProductService {
         ProductDTO dto = new ProductDTO();
         dto.setPid(product.getPid());
         dto.setProductName(product.getProductName());
+        dto.setProfit(product.getProfit());
         return dto;
     }
 
@@ -67,6 +70,7 @@ public class ProductService {
         Product product = new Product();
         product.setPid(dto.getPid());
         product.setProductName(dto.getProductName());
+        product.setProfit(dto.getProfit());
         return product;
     }
 }
