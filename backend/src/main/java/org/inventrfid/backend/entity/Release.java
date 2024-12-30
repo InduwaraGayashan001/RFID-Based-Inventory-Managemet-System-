@@ -32,6 +32,8 @@ public class Release {
     @Column(name = "releasePrice", nullable = true)
     private java.math.BigDecimal releasePrice;
 
+    @Column(name = "Profit", nullable = true)
+    private java.math.BigDecimal profit;
 
 
 
