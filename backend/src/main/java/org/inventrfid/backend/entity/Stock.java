@@ -29,5 +29,7 @@ public class Stock {
     @Column(name = "stockPrice", nullable = true)
     private java.math.BigDecimal stockPrice;
 
+    @Column(name = "Profit", nullable = true)
+    private java.math.BigDecimal profit;
 
 }
