@@ -26,7 +26,9 @@ public class StockService {
     public Stock createStockFromMqtt(String rfid) {
         Stock stock = new Stock();
 
-        stock.setRfid(rfid);// Default stock price as 0
+        stock.setRfid(rfid);
+        stock.setStockPrice(BigDecimal.valueOf(0));
+        stock.setQuantity(0);// Default stock price as 0
         stock.setTimestamp(new Date());
 
         return stockRepository.save(stock);
@@ -51,6 +53,7 @@ public class StockService {
             stock.setQuantity(quantity);
             stock.setProduct(product);
             stock.setStockPrice(stockPrice);
+            stock.setProfit(BigDecimal.valueOf(0));
             //stock.setTimestamp(new Date());  // Update timestamp when stock is updated
             return stockRepository.save(stock);
         } else {
@@ -91,19 +94,10 @@ public class StockService {
         stockDTO.setTimestamp(stock.getTimestamp());
         stockDTO.setQuantity(stock.getQuantity());
         stockDTO.setStockPrice(stock.getStockPrice());
+        stockDTO.setProfit(stock.getProfit());
         return stockDTO;
     }
 
-    // Convert StockDTO to Stock entity
-    public Stock mapToEntity(StockDTO stockDTO) {
-        Stock stock = new Stock();
-        stock.setRfid(stockDTO.getRfid());
-        stock.setProduct(productRepository.getReferenceById(stockDTO.getProductId()));
-        stock.setTimestamp(stockDTO.getTimestamp());
-        stock.setQuantity(stockDTO.getQuantity());
-        stock.setStockPrice(stockDTO.getStockPrice());
-        return stock;
-    }
 
     // Method to get the last stock item
     public Stock getLastStock() {
