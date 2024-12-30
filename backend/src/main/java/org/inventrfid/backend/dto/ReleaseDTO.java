@@ -15,5 +15,6 @@ public class ReleaseDTO {
     private int releaseQuantity;
     private BigDecimal releasePrice;
     private Date timestamp;
+    private BigDecimal profit;
 
 }
