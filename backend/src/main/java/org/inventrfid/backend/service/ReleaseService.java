@@ -1,8 +1,10 @@
 package org.inventrfid.backend.service;
 
 import org.inventrfid.backend.dto.ReleaseDTO;
+import org.inventrfid.backend.entity.Product;
 import org.inventrfid.backend.entity.Release;
 import org.inventrfid.backend.entity.Stock;
+import org.inventrfid.backend.repository.ProductRepository;
 import org.inventrfid.backend.repository.ReleaseRepository;
 import org.inventrfid.backend.repository.StockRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,16 +25,22 @@ public class ReleaseService {
     private final ReleaseRepository releaseRepository;
     @Autowired
     private final StockRepository stockRepository;
+    @Autowired
+    private final ProductRepository productRepository;
 
-    public ReleaseService(ReleaseRepository releaseRepository, StockRepository stockRepository) {
+    public ReleaseService(ReleaseRepository releaseRepository, StockRepository stockRepository, ProductRepository productRepository) {
         this.releaseRepository = releaseRepository;
         this.stockRepository = stockRepository;
+        this.productRepository = productRepository;
     }
 
     public Release createRelease(String rfid) {
         Stock stock = stockRepository.findByRfid(rfid);
         Release release = new Release();
         release.setStock(stock);
+        release.setProfit(BigDecimal.valueOf(0));
+        release.setProfit(BigDecimal.valueOf(0));
+        release.setReleaseQuantity(0);
         release.setTimestamp(new Date());
         return releaseRepository.save(release);
     }
@@ -45,6 +53,9 @@ public class ReleaseService {
         // Fetch the associated stock by stock ID from the release
         Stock stock = stockRepository.findById(release.getStock().getRfid())
                 .orElseThrow(() -> new RuntimeException("Stock not found with Stock ID: " + release.getStock().getRfid()));
+
+        Product product = productRepository.findById(stock.getProduct().getPid())
+                .orElseThrow(() -> new RuntimeException("Product not found with Product ID: " + stock.getProduct().getPid()));
 
         // Check if the new release quantity exceeds the available stock
         int stockAvailable = stock.getQuantity();
@@ -59,11 +70,29 @@ public class ReleaseService {
 
         // Update the stock quantity
         stock.setQuantity(stockAvailable - quantityDifference);
-        stockRepository.save(stock);
+
+        //Update the profit per stock
+        BigDecimal stockPrice = stock.getStockPrice();
+        BigDecimal currentProfitInStock = stock.getProfit();
+        BigDecimal currentProfitInProduct = product.getProfit();
+        BigDecimal currentProfitInRelease = release.getProfit();
+        BigDecimal quantityDifferenceDec = BigDecimal.valueOf(quantityDifference);
+        BigDecimal priceDifference = releasePrice.subtract(stockPrice);
+        BigDecimal profit = quantityDifferenceDec.multiply(priceDifference);
+
+        //Update the profit per product
+        product.setProfit(currentProfitInProduct.add(profit));
+
+        //Update the profit per stock
+        stock.setProfit(currentProfitInStock.add(profit));
 
         // Update the release details
         release.setReleaseQuantity(releaseQuantity);
         release.setReleasePrice(releasePrice);
+        release.setProfit(currentProfitInRelease.add(profit));
+
+        productRepository.save(product);
+        stockRepository.save(stock);
         return releaseRepository.save(release);
     }
 
@@ -89,9 +118,20 @@ public class ReleaseService {
         Stock stock = stockRepository.findById(release.getStock().getRfid())
                 .orElseThrow(() -> new RuntimeException("Stock not found with Stock ID: " + release.getStock().getRfid()));
 
+        //Fetch the associated product
+        Product product = productRepository.findById(stock.getProduct().getPid())
+                .orElseThrow(() -> new RuntimeException("Product not found with Product ID: " + stock.getProduct().getPid()));
+
+
         // Restore the release quantity back to the stock
         stock.setQuantity(stock.getQuantity() + release.getReleaseQuantity());
+
+        //Restore the gained profit back to the stock and product
+        stock.setProfit(stock.getProfit().subtract(release.getProfit()));
+        product.setProfit(product.getProfit().subtract(release.getProfit()));
+
         stockRepository.save(stock);
+        productRepository.save(product);
 
         // Delete the release
         releaseRepository.delete(release);
@@ -108,22 +148,9 @@ public class ReleaseService {
         dto.setReleaseQuantity(release.getReleaseQuantity());
         dto.setReleasePrice(release.getReleasePrice());
         dto.setTimestamp(release.getTimestamp());
+        dto.setProfit(release.getProfit());
         dto.setRfid(release.getStock() != null ? release.getStock().getRfid() : null);
         return dto;
-    }
-
-    public Release mapToEntity(ReleaseDTO dto) {
-        Release release = new Release();
-        release.setTransactionId(dto.getTransactionId());
-        release.setReleaseQuantity(dto.getReleaseQuantity());
-        release.setTimestamp(dto.getTimestamp());
-        release.setReleasePrice(dto.getReleasePrice());
-        if (dto.getRfid() != null) {
-            Stock stock = stockRepository.findById(dto.getRfid())
-                    .orElseThrow(() -> new RuntimeException("Stock not found with ID: " + dto.getRfid()));
-            release.setStock(stock);
-        }
-        return release;
     }
 
 }
