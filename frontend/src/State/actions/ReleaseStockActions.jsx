@@ -16,6 +16,12 @@ export const fetchLastStock = () => async (dispatch) => {
       releasePrice: product.releasePrice,
       time: new Date(product.timestamp).toISOString().replace('T', ' ').split('.')[0],
     }));
+    console.log('Fetched releases:', product);
+    if (product.releaseQuantity !== 0) {
+        alert('Current scanned RFID related stock ' + product.stockId + ' already released. Redirecting to view Release Page. Scan new RFID again and try again.');
+        window.location.href = '/view-release'; 
+        return;
+      };
   } catch (error) {
     dispatch(fetchStockFailure(error.message));
   }
