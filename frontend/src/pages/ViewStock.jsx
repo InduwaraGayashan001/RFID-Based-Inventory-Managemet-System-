@@ -85,15 +85,35 @@ function ViewStock() {
       });
   };
 
-const handleEdit = (index) => {
+// const handleEdit = async (index) => {
+//   console.log(rows[index].productName); // Debugging
+//   if (rows[index].productName == 0) {
+//     setZeroProductDialogOpen(true); // Open the popup
+//     return;
+//   }
+//   console.log("Name",rows[index].productName);
+//   setEditIndex(index); // Proceed with edit
+//   setSelectedProductName(selectedProduct.productName);
+// };
+
+const handleEdit = async (index) => {
   console.log(rows[index].productName); // Debugging
-  if (rows[index].productName == 0) {
+  if (!rows[index].productName) { // Check if productName is falsy
     setZeroProductDialogOpen(true); // Open the popup
     return;
   }
-  console.log(rows[index].productName);
+  console.log("Name", rows[index].productName);
   setEditIndex(index); // Proceed with edit
+
+  console.log("Selected Product Name: Hi", rows[index].productName);
+    const products = await getProductsByID(rows[index].productName);
+    console.log("Products:", products);
+    setSelectedProductName(products.data.productName);
+    setSelectedProduct(products.data.pid);
+     
+  
 };
+
 
 const closeZeroProductDialog = () => {
   setZeroProductDialogOpen(false);
@@ -145,6 +165,11 @@ const closeZeroProductDialog = () => {
     setConfirmDelete({ open: false, index: null });
   };
 
+  const getProductsByID = async (Pid) => {
+    const response = await axios.get(`http://localhost:8080/api/products/${Pid}`);
+    
+    return response; // Returns the list of products
+  };
 
   const getProducts = async () => {
     const response = await axios.get('http://localhost:8080/api/products');
@@ -247,7 +272,7 @@ const closeZeroProductDialog = () => {
         console.log('Product updated successfully:', payload);
         fetchProducts(updatedProduct.stockId);
         setEditIndex(null); // Exit edit mode
-        setSelectedProductName('');
+        //setSelectedProductName('');
       })
       .catch(error => {
         console.error('There was an error updating the product!', error);
