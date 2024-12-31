@@ -14,7 +14,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Clogo from '../assets/clogo.png';
 
 const headerWidth = 240;
@@ -31,6 +31,7 @@ function Header(props) {
   const { window } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleDrawerToggle = () => {
     setMobileOpen((prevState) => !prevState);
@@ -45,7 +46,14 @@ function Header(props) {
       <List>
         {navItems.map((item) => (
           <ListItem key={item.name} disablePadding>
-            <ListItemButton sx={{ textAlign: 'center' }} onClick={() => navigate(item.path)}>
+            <ListItemButton
+              sx={{
+                textAlign: 'center',
+                backgroundColor: location.pathname === item.path ? 'rgb(11, 86, 198)' : 'inherit', // Darker shade for highlighted item
+                '&:hover': { backgroundColor: 'rgb(11, 107, 203)' }, // Hover color for the items
+              }}
+              onClick={() => navigate(item.path)}
+            >
               <ListItemText primary={item.name} />
             </ListItemButton>
           </ListItem>
@@ -70,21 +78,30 @@ function Header(props) {
           >
             <MenuIcon />
           </IconButton>
-          
+
           <Typography
             variant="h5"
             component="div"
             sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
           >
             <Button sx={{ color: '#fff' }} onClick={() => navigate("/")}>
-            <img src={Clogo} alt="Company Logo" style={{ maxWidth: '40px', height: 'auto', padding: '5px' }} />
-                Inventory Management System
+              <img src={Clogo} alt="Company Logo" style={{ maxWidth: '40px', height: 'auto', padding: '5px' }} />
+              Inventory Management System
             </Button>
-            </Typography>
+          </Typography>
 
           <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
             {navItems.map((item) => (
-              <Button key={item.name} sx={{ color: '#fff' }} onClick={() => navigate(item.path)}>
+              <Button
+                key={item.name}
+                sx={{
+                  color: '#fff',
+                  borderBottom: location.pathname === item.path ? '2px solid #fff' : 'none',
+                  backgroundColor: location.pathname === item.path ? 'rgb(11, 86, 198)' : 'inherit', // Darker shade for selected item
+                  '&:hover': { backgroundColor: 'rgb(11, 107, 203)' }, // Hover color for the items
+                }}
+                onClick={() => navigate(item.path)}
+              >
                 {item.name}
               </Button>
             ))}
@@ -102,7 +119,7 @@ function Header(props) {
           }}
           sx={{
             display: { xs: 'block', sm: 'none' },
-            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: headerWidth  },
+            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: headerWidth },
           }}
         >
           {drawer}
@@ -112,5 +129,6 @@ function Header(props) {
   );
 }
 
-
 export default Header;
+
+
