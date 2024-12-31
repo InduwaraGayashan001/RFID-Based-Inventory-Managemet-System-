@@ -406,7 +406,11 @@ function AddStock() {
       {/* Dialog Component */}
       <Dialog
         open={dialog.open}
-        onClose={() => setDialog({ ...dialog, open: false })}
+        onClose={(event, reason) => {
+          if (reason !== 'backdropClick') {
+            setDialog({ ...dialog, open: false });
+          }
+        }}
         aria-labelledby="dialog-title"
         aria-describedby="dialog-description"
       >
@@ -415,12 +419,12 @@ function AddStock() {
           <DialogContentText id="dialog-description">{dialog.message}</DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDialog({ ...dialog, open: false })} color="primary">
+          {/* <Button onClick={() => setDialog({ ...dialog, open: false })} color="primary">
             Close
-          </Button>
+          </Button> */}
           {dialog.onConfirm && (
             <Button onClick={dialog.onConfirm} color="secondary" autoFocus>
-              Confirm
+              Ok
             </Button>
           )}
         </DialogActions>
