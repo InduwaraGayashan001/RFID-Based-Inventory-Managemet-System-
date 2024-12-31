@@ -1,6 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import { Typography, Box, Card, CardContent, CircularProgress, Grid, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
+import {
+  Typography,
+  Box,
+  Card,
+  CardContent,
+  CircularProgress,
+  Grid,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+} from '@mui/material';
+import { Doughnut } from 'react-chartjs-2';
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import axios from 'axios';
+
+ChartJS.register(ArcElement, Tooltip, Legend);
 
 function Dashboard() {
   const [summary, setSummary] = useState(null);
@@ -78,7 +94,7 @@ function Dashboard() {
       </CardContent>
     </Card>
   );
-  
+
   const renderProductProfitsTable = () => (
     <Table
       sx={{
@@ -133,6 +149,147 @@ function Dashboard() {
     </Table>
   );
 
+  const renderPieCharts = () => {
+    const labels = productProfits.map((product) => product.productName);
+
+    const availableData = productProfits.map((product) => product.stockQuantity);
+    const releasedData = productProfits.map((product) => product.releaseQuantity);
+    const profitData = productProfits.map((product) => product.profit);
+
+    const colors = [
+      '#D32F2F',  // Dark Red
+      '#1976D2',  // Dark Blue
+      '#388E3C',  // Dark Green
+      '#F57C00',  // Dark Orange
+      '#8E24AA',  // Dark Purple
+      '#0288D1',  // Bright Blue
+      '#C2185B',  // Dark Pink
+      '#7B1FA2',  // Purple
+      '#0288D1',  // Bright Blue
+      '#FBC02D',  // Dark Yellow
+      '#FF5722',  // Dark Coral
+      '#FF9800',  // Dark Amber
+      '#8B4513',  // Dark Brown
+      '#3F51B5',  // Indigo
+      '#607D8B',  // Dark Slate Gray
+      '#9E9D24',  // Olive Green
+      '#E64A19',  // Red-Orange
+      '#43A047',  // Green
+      '#512DA8',  // Deep Purple
+      '#795548',  // Dark Brown
+    ];
+
+    const createChartData = (data, label) => ({
+      labels,
+      datasets: [
+        {
+          label,
+          data,
+          backgroundColor: colors,
+          hoverBackgroundColor: colors,
+        },
+      ],
+    });
+
+    return (
+      <Grid container spacing={3} sx={{ marginTop: '10px' }}>
+        <Grid item xs={12} md={4}>
+          <Card
+            sx={{
+              minWidth: 250,
+              maxWidth: 300,
+              backgroundColor: '#e3f2fd',
+              boxShadow: 3,
+              margin: '10px',
+              transition: 'transform 0.2s ease-in-out',
+              '&:hover': {
+                transform: 'scale(1.05)',
+              },
+            }}
+          >
+            <CardContent sx={{ textAlign: 'center' }}>
+              <Typography
+                variant="h6"
+                component="h3"
+                sx={{
+                  fontWeight: 'bold',
+                  marginBottom: '10px',
+                  color: '#1976d2',
+                }}
+              >
+                Units Available
+              </Typography>
+              <Doughnut data={createChartData(availableData, 'Units Available')} />
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid item xs={12} md={4}>
+          <Card
+            sx={{
+              minWidth: 250,
+              maxWidth: 300,
+              backgroundColor: '#e3f2fd',
+              boxShadow: 3,
+              margin: '10px',
+              transition: 'transform 0.2s ease-in-out',
+              '&:hover': {
+                transform: 'scale(1.05)',
+              },
+            }}
+          >
+            <CardContent sx={{ textAlign: 'center' }}>
+              <Typography
+                variant="h6"
+                component="h3"
+                sx={{
+                  fontWeight: 'bold',
+                  marginBottom: '10px',
+                  color: '#1976d2',
+                }}
+              >
+                Units Released
+              </Typography>
+              <Doughnut data={createChartData(releasedData, 'Units Released')} />
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid item xs={12} md={4}>
+          <Card
+            sx={{
+              minWidth: 250,
+              maxWidth: 300,
+              backgroundColor: '#e3f2fd',
+              boxShadow: 3,
+              margin: '10px',
+              transition: 'transform 0.2s ease-in-out',
+              '&:hover': {
+                transform: 'scale(1.05)',
+              },
+            }}
+          >
+            <CardContent sx={{ textAlign: 'center' }}>
+              <Typography
+                variant="h6"
+                component="h3"
+                sx={{
+                  fontWeight: 'bold',
+                  marginBottom: '10px',
+                  color: '#1976d2',
+                }}
+              >
+                Profit Distribution
+              </Typography>
+              <Doughnut data={createChartData(profitData, 'Profit')} />
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+    );
+  };
+
+
   return (
     <Box
       sx={{
@@ -142,7 +299,6 @@ function Dashboard() {
         gap: '10px',
       }}
     >
-      {/* Dashboard Header */}
       <Box
         sx={{
           padding: '10px',
@@ -158,22 +314,25 @@ function Dashboard() {
         </Typography>
       </Box>
 
-      {/* Loading or Error State */}
       {loading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
           <CircularProgress />
         </Box>
       ) : error ? (
-        <Typography color="error">{error}</Typography>
+        <Typography
+          color="error"
+          sx={{ textAlign: 'center', marginTop: '20px' }}
+        >
+          {error}
+        </Typography>
       ) : (
         <>
-          {/* Cards Section */}
-          <Grid container spacing={3} sx={{ justifyContent: 'flex-start' }}>
+          <Grid container spacing={3}>
             <Grid item xs={12} sm={4}>
               {renderCard('Total Products', summary.totalProducts, '#003366')}
             </Grid>
             <Grid item xs={12} sm={4}>
-              {renderCard('Total Units Available ', summary.totalStockQuantity, '#003366')}
+              {renderCard('Total Units Available', summary.totalStockQuantity, '#003366')}
             </Grid>
             <Grid item xs={12} sm={4}>
               {renderCard('Total Units Released', summary.totalReleaseUnits, '#003366')}
@@ -189,7 +348,6 @@ function Dashboard() {
             </Grid>
           </Grid>
 
-          {/* Product Profits Table */}
           <Typography
             variant="h5"
             component="h2"
@@ -197,6 +355,17 @@ function Dashboard() {
           >
             Product Performance
           </Typography>
+
+          {renderPieCharts()}
+
+          <Typography
+            variant="h5"
+            component="h2"
+            sx={{ marginTop: '30px', fontWeight: 'bold', color: '#1976d2' }}
+          >
+            
+          </Typography>
+
           {renderProductProfitsTable()}
         </>
       )}
@@ -205,5 +374,7 @@ function Dashboard() {
 }
 
 export default Dashboard;
+
+
 
 
