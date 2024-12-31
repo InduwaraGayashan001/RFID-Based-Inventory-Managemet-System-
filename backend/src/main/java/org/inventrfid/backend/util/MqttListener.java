@@ -1,19 +1,22 @@
 package org.inventrfid.backend.util;
 
-import org.springframework.integration.annotation.ServiceActivator;
-import org.springframework.stereotype.Service;
 import org.inventrfid.backend.service.StockService;
 import org.inventrfid.backend.service.ReleaseService;
+import org.inventrfid.backend.service.TutorialHandler;
+import org.springframework.integration.annotation.ServiceActivator;
+import org.springframework.stereotype.Service;
 
 @Service
 public class MqttListener {
 
     private final StockService stockService;
     private final ReleaseService releaseService;
+    private final TutorialHandler tutorialHandler;
 
-    public MqttListener(StockService stockService, ReleaseService releaseService) {
+    public MqttListener(StockService stockService, ReleaseService releaseService, TutorialHandler tutorialHandler) {
         this.stockService = stockService;
         this.releaseService = releaseService;
+        this.tutorialHandler = tutorialHandler;
     }
 
     @ServiceActivator(inputChannel = "mqttInputChannel")
@@ -23,13 +26,17 @@ public class MqttListener {
             System.out.println("Message received: " + message);
             try {
                 if (stockService.doesStockExist(message)) {
-                    // Create a new Release entry
                     releaseService.createRelease(message);
                     System.out.println("New Release created for RFID: " + message);
+
+                    // Send update to frontend
+                    tutorialHandler.broadcastMessage("New Release created: " + message);
                 } else {
-                    // Create a new RFID entry
                     stockService.createStockFromMqtt(message);
                     System.out.println("New Stock created with RFID: " + message);
+
+                    // Send update to frontend
+                    tutorialHandler.broadcastMessage("New Stock created: " + message);
                 }
             } catch (RuntimeException e) {
                 System.err.println("Error processing message: " + e.getMessage());
@@ -38,7 +45,4 @@ public class MqttListener {
             System.out.println("Unknown message received: " + message);
         }
     }
-
 }
-
-
