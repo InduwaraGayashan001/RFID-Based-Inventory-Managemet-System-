@@ -54,6 +54,18 @@ const Home = () => {
           variant="contained"
           color="primary"
           size="large"
+          onClick={() => navigate("/dashboard")}
+          sx={{
+            width: "400px",
+            fontSize: "18px",
+          }}
+        >
+          Dashboard
+        </Button>
+        <Button
+          variant="contained"
+          color="primary"
+          size="large"
           onClick={() => navigate("/view-stock")}
           sx={{
             width: "400px",
