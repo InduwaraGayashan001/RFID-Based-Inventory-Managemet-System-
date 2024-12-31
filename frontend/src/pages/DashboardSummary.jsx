@@ -34,19 +34,24 @@ function Dashboard() {
   const renderCard = (title, value, valueColor) => (
     <Card
       sx={{
-        minWidth: 200,
+        minWidth: 250,
         maxWidth: 300,
         backgroundColor: '#e3f2fd',
         boxShadow: 3,
         margin: '10px',
+        transition: 'transform 0.2s ease-in-out',
+        '&:hover': {
+          transform: 'scale(1.05)',
+        },
       }}
     >
       <CardContent
         sx={{
           display: 'flex',
           flexDirection: 'column',
-          justifyContent: 'flex-start',
+          justifyContent: 'space-between',
           height: '100%',
+          textAlign: 'center',
         }}
       >
         <Typography
@@ -56,35 +61,24 @@ function Dashboard() {
             color: '#1976d2',
             fontWeight: 'bold',
             marginBottom: '10px',
-            textAlign: 'center',
           }}
         >
           {title}
         </Typography>
-        <Box
+        <Typography
+          variant="h4"
+          component="p"
           sx={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            flexGrow: 1,
+            color: valueColor,
+            fontWeight: 'bold',
           }}
         >
-          <Typography
-            variant="h4"
-            component="p"
-            sx={{
-              color: valueColor,
-              fontWeight: 'bold',
-              textAlign: 'center',
-            }}
-          >
-            {value}
-          </Typography>
-        </Box>
+          {value}
+        </Typography>
       </CardContent>
     </Card>
   );
-
+  
   const renderProductProfitsTable = () => (
     <Table
       sx={{
