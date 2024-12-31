@@ -19,7 +19,7 @@ public class MqttListener {
     @ServiceActivator(inputChannel = "mqttInputChannel")
     public void handleMessage(String message) {
 
-        if (message.startsWith("rfid")) {
+        if (message.startsWith("STK")) {
             System.out.println("Message received: " + message);
             try {
                 if (stockService.doesStockExist(message)) {
