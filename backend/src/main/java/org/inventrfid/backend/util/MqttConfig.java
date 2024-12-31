@@ -35,14 +35,14 @@ public class MqttConfig {
     public MessageHandler mqttOutboundHandler(MqttPahoClientFactory factory) {
         MqttPahoMessageHandler handler = new MqttPahoMessageHandler(CLIENT_ID, factory);
         handler.setAsync(true);
-        handler.setDefaultTopic("test/topic");
+        handler.setDefaultTopic("test/rfidIDN");
         return handler;
     }
 
     @Bean
     public MqttPahoMessageDrivenChannelAdapter mqttInbound(MqttPahoClientFactory factory) {
         MqttPahoMessageDrivenChannelAdapter adapter =
-                new MqttPahoMessageDrivenChannelAdapter(CLIENT_ID + "_inbound", factory, "test/topic");
+                new MqttPahoMessageDrivenChannelAdapter(CLIENT_ID + "_inbound", factory, "test/rfidIDN");
         adapter.setOutputChannel(mqttInputChannel());
         return adapter;
     }
