@@ -39,7 +39,7 @@ public class ReleaseService {
         Release release = new Release();
         release.setStock(stock);
         release.setProfit(BigDecimal.valueOf(0));
-        release.setProfit(BigDecimal.valueOf(0));
+        release.setReleasePrice(BigDecimal.valueOf(0));
         release.setReleaseQuantity(0);
         release.setTimestamp(new Date());
         return releaseRepository.save(release);
