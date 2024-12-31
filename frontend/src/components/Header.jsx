@@ -49,7 +49,7 @@ function Header(props) {
             <ListItemButton
               sx={{
                 textAlign: 'center',
-                backgroundColor: location.pathname === item.path ? 'rgb(11, 86, 198)' : 'inherit', // Darker shade for highlighted item
+                backgroundColor: location.pathname === item.path ? 'rgb(11, 107, 203)' : 'inherit', // Darker shade for highlighted item
                 '&:hover': { backgroundColor: 'rgb(11, 107, 203)' }, // Hover color for the items
               }}
               onClick={() => navigate(item.path)}
@@ -97,7 +97,7 @@ function Header(props) {
                 sx={{
                   color: '#fff',
                   borderBottom: location.pathname === item.path ? '2px solid #fff' : 'none',
-                  backgroundColor: location.pathname === item.path ? 'rgb(11, 86, 198)' : 'inherit', // Darker shade for selected item
+                  backgroundColor: location.pathname === item.path ? 'rgb(11, 107, 203)' : 'inherit', // Darker shade for selected item
                   '&:hover': { backgroundColor: 'rgb(11, 107, 203)' }, // Hover color for the items
                 }}
                 onClick={() => navigate(item.path)}
