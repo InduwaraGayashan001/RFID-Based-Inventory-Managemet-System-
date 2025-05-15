@@ -93,21 +93,3 @@ REACT_APP_MQTT_BROKER=ws://localhost:9001
 3. Use the RFID reader to scan items
 4. Monitor real-time updates in the inventory list
 5. Generate reports as needed
-
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## Support
-
-For support, please open an issue in the GitHub repository or contact the development team.
-
-## Acknowledgments
-
-- Spring Boot team for the excellent framework
-- React team for the frontend library
-- All contributors who have helped shape this project
